@@ -2,6 +2,7 @@
 
 import click
 import jcb
+import sys
 import yaml
 
 # --------------------------------------------------------------------------------------------------
@@ -50,7 +51,11 @@ def render(dictionary_of_templates, jedi_yaml):
         dictionary_of_templates = yaml.safe_load(f)
 
     # Call the jcb render function
-    jedi_dict = jcb.render(dictionary_of_templates)
+    try:
+        jedi_dict = jcb.render(dictionary_of_templates)
+    except Exception as e:
+        message = f"JCB failed to render the dictionary of templates | {e}"
+        raise click.ClickException(message)
 
     # Write jedi_dict to yaml file
     with open(jedi_yaml, 'w') as f:

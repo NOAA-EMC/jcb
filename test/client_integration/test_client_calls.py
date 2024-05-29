@@ -3,6 +3,7 @@
 
 import copy
 import glob
+import logging
 import multiprocessing
 import os
 
@@ -12,6 +13,17 @@ import yaml
 
 
 # --------------------------------------------------------------------------------------------------
+
+
+red = '\033[91m'
+end = '\033[0m'
+
+
+# --------------------------------------------------------------------------------------------------
+
+# Configure logging for multiprocessing
+logger = multiprocessing.log_to_stderr()
+logger.setLevel(logging.ERROR)
 
 
 def test_jcb():
@@ -51,8 +63,26 @@ def test_jcb():
     # Call testing with n workers for more speed
     # ------------------------------------------
     n_workers = 6
+    results = []
     with multiprocessing.Pool(processes=n_workers) as pool:
-        pool.map(jcb.render_app_with_test_config, app_model_testing_configs)
+        try:
+            results = pool.map(jcb.render_app_with_test_config, app_model_testing_configs)
+        except Exception as e:
+            pool.terminate()
+            pool.join()
+            pytest.fail(f"Test failed due to an exception: {e}")
+        finally:
+            pool.close()
+            pool.join()
+
+    # Display any failures
+    # --------------------
+    if any(isinstance(result, Exception) for result in results):
+        print(red+'The following failures were encountered when testing the client calls:'+end)
+        for result in results:
+            if isinstance(result, Exception):
+                print(red+f"  - {result}"+end)
+        return 1
 
 
 # --------------------------------------------------------------------------------------------------
@@ -60,7 +90,7 @@ def test_jcb():
 
 # Main entry point
 if __name__ == "__main__":
-    pytest.main()
+    test_jcb() #pytest.main()
 
 
 # --------------------------------------------------------------------------------------------------

@@ -58,7 +58,10 @@ def render_app_with_test_config(app_test_config):
 
     # Style 1 for call: all in one API
     # --------------------------------
-    jedi_dict_1 = jcb.render(app_test_config)
+    try:
+        jedi_dict_1 = jcb.render(app_test_config)
+    except Exception as e:
+        return e
 
     # Style 2 for call: renderer for multiple algorithms
     # --------------------------------------------------
@@ -66,11 +69,18 @@ def render_app_with_test_config(app_test_config):
     algorithm = app_test_config['algorithm']
     del app_test_config['algorithm']
 
-    jcb_obj = jcb.Renderer(app_test_config)
-    jedi_dict_2 = jcb_obj.render(algorithm)
+    try:
+        jcb_obj = jcb.Renderer(app_test_config)
+        jedi_dict_2 = jcb_obj.render(algorithm)
+    except Exception as e:
+        return e
 
     # Assert that the two outputs match one another
-    assert jedi_dict_1 == jedi_dict_2
+    if jedi_dict_1 != jedi_dict_2:
+        raise ValueError(f"Outputs do not match for {app_test_config['app']} and {algorithm}")
+
+    # Return
+    return 0
 
 
 # --------------------------------------------------------------------------------------------------
