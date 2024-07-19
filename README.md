@@ -1,23 +1,4 @@
-<div
-  align="center"
->
-
-<img
-  style="vertical-align:middle"
-  src="https://github.com/danholdaway/jcb/blob/develop/etc/jcb.png"
-  width="30%"
-  alt="JEDI Configuration Builder"
-/>
-
-<img
-  style="vertical-align:middle"
-  src="https://github.com/danholdaway/jcb/blob/develop/etc/jcb-text.png"
-  width="40%"
-  alt="JEDI Configuration Builder"
-/>
-</div>
-
-#
+# JEDI Configuration Builder
 
 ### Repository status:
 
