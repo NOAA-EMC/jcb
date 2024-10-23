@@ -2,7 +2,6 @@
 
 
 import os
-import sys
 
 import jcb
 import jinja2 as j2
