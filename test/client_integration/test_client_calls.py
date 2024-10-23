@@ -28,6 +28,7 @@ def test_jcb():
     # ----------------------------------------------------------------------
     # Loop over apps
     for app in apps:
+
         path = os.path.join(os.path.dirname(__file__), f'{app}-*-templates.yaml')
         app_model_configs = glob.glob(path)
 
