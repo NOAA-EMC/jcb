@@ -84,6 +84,12 @@ def test_jcb():
                 print(red+f"  - {result}"+end)
         return 1
 
+    # Call in serial (for debugging)
+    # ------------------------------
+    # for app_model_testing_config in app_model_testing_configs:
+        # print(yaml.dump(app_model_testing_config))
+        # jcb.render_app_with_test_config(app_model_testing_config)
+
 
 # --------------------------------------------------------------------------------------------------
 

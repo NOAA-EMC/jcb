@@ -1,23 +1,4 @@
-<div
-  align="center"
->
-
-<img
-  style="vertical-align:middle"
-  src="https://github.com/danholdaway/jcb/blob/develop/etc/jcb.png"
-  width="30%"
-  alt="JEDI Configuration Builder"
-/>
-
-<img
-  style="vertical-align:middle"
-  src="https://github.com/danholdaway/jcb/blob/develop/etc/jcb-text.png"
-  width="40%"
-  alt="JEDI Configuration Builder"
-/>
-</div>
-
-#
+# JEDI Configuration Builder
 
 ### Repository status:
 
@@ -26,8 +7,12 @@
 ### Installation
 
 ``` shell
-git clone --recurse-submodules https://github.com/noaa-emc/jcb
+git clone https://github.com/noaa-emc/jcb
 cd jcb
+
+# Optional step if you want to run the client integration tests
+./jcb_client_init.py  # May first require `pip install pyyaml` if it is not available
+
 pip install --prefix=/path/to/where/you/want/installed .
 ```
 

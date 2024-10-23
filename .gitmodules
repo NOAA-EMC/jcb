@@ -1,8 +1,0 @@
-[submodule "src/jcb/configuration/apps/gdas"]
-	path = src/jcb/configuration/apps/gdas
-	url = https://github.com/NOAA-EMC/jcb-gdas
-	branch = develop
-[submodule "src/jcb/configuration/algorithms"]
-	path = src/jcb/configuration/algorithms
-	url = https://github.com/noaa-emc/jcb-algorithms
-	branch = develop

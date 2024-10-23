@@ -68,6 +68,8 @@ jobs:
       - name: Install the code
         run: |
           cd $GITHUB_WORKSPACE
+          pip install pyyaml
+          ./jcb_client_init.py
           pip install .[testing]
 
       - name: Run unit tests

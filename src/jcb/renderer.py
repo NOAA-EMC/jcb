@@ -2,7 +2,6 @@
 
 
 import os
-import sys
 
 import jcb
 import jinja2 as j2
@@ -193,9 +192,8 @@ class Renderer():
         try:
             jedi_dict_yaml = template.render(self.template_dict)
         except j2.exceptions.UndefinedError as e:
-            message = f'Resolving templates for {algorithm} failed with the following ' + \
-                      f'exception: {e}'
-            raise RuntimeError(message)
+            print(f'Resolving templates for {algorithm} failed with the following exception: {e}')
+            return None
 
         # Check that everything was rendered
         jcb.abort_if('{{' in jedi_dict_yaml, f'In template_string_jinja2 '

@@ -1,3 +1,7 @@
+# JCB clients
+src/jcb/configuration/algorithms/
+src/jcb/configuration/apps/gdas/
+
 # Mac files
 .DS_Store
 

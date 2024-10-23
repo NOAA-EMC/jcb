@@ -63,6 +63,10 @@ def render_app_with_test_config(app_test_config):
     except Exception as e:
         return e
 
+    # Assert that the output is a dictionary
+    # --------------------------------------
+    assert isinstance(jedi_dict_1, dict)
+
     # Style 2 for call: renderer for multiple algorithms
     # --------------------------------------------------
     # Algorithm does not need to be in the dictionary of templates
@@ -74,6 +78,10 @@ def render_app_with_test_config(app_test_config):
         jedi_dict_2 = jcb_obj.render(algorithm)
     except Exception as e:
         return e
+
+    # Assert that the output is a dictionary
+    # --------------------------------------
+    assert isinstance(jedi_dict_2, dict)
 
     # Assert that the two outputs match one another
     if jedi_dict_1 != jedi_dict_2:
