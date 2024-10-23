@@ -55,8 +55,6 @@ atmosphere_ensemble_history_prefix: "ens_"
 
 atmosphere_background_time_iso: '2024-02-02T00:00:00Z'
 
-
-
 # Background error
 
 atmosphere_bump_data_directory: DATA/berror
