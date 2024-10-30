@@ -244,6 +244,7 @@ def test_client_allowable_components():
         'observations',
         'algorithm',
         'observation_chronicle',
+        'test',
         ]
 
     # Loop over the apps

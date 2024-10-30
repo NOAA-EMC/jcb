@@ -69,6 +69,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           pip install pyyaml
+          git branch
           ./jcb_client_init.py
           pip install .[testing]
 
