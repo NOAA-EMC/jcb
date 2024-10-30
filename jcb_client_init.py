@@ -244,6 +244,20 @@ if __name__ == "__main__":
     # Clone or update the repositories
     clone_or_update_repos(jcb_apps)
 
+    # Link all the application test YAML files to client_integration test directory
+    for app, app_conf in jcb_apps.items():
+        test_path = os.path.join(app_conf['target_path'], 'test', 'client_integration')
+        if not os.path.exists(test_path):
+            continue
+        yaml_files = [f for f in os.listdir(test_path) if f.endswith('.yaml')]
+        # Link all the files (may already exist)
+        for yaml_file in yaml_files:
+            src = os.path.join(test_path, yaml_file)
+            dst = os.path.join(file_path, 'test', 'client_integration', yaml_file)
+            if os.path.exists(dst):
+                os.remove(dst)
+            os.symlink(src, dst)
+
     write_message('Initialization of jcb clients is complete')
     write_message(' ')
     write_message('-'*100)
