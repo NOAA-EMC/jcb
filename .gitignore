@@ -1,6 +1,7 @@
 # JCB clients
 src/jcb/configuration/algorithms/
 src/jcb/configuration/apps/gdas/
+test/client_integration/*yaml
 
 # Mac files
 .DS_Store
