@@ -144,11 +144,11 @@ class ObservationChronicle():
         if variable_name == 'not_biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
             channel_not_bias_corrected = \
-                    [channel for channel, values in sat_values.items() if not values[var_idx]]
+                [channel for channel, values in sat_values.items() if not values[var_idx]]
         elif variable_name == 'biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
             channel_bias_corrected = \
-                    [channel for channel, values in sat_values.items() if values[var_idx]]
+                [channel for channel, values in sat_values.items() if values[var_idx]]
         else:
             # Assert that variable_name is in the variables and get the index
             jcb.abort_if(variable_name not in sat_variables,
@@ -164,12 +164,12 @@ class ObservationChronicle():
         if variable_name == 'simulated':
             return ", ".join(str(element) for element in sat_simulated)
         elif variable_name == 'not_biascorrtd':
-            str_not_bias_corrected = ", ".join(str(element) for element in channel_not_bias_corrected)
-            # Returns a number -999 if all channels are to be bias-corrected. It keeps UFO from 
+            not_bias_corrected = ", ".join(str(element) for element in channel_not_bias_corrected)
+            # Returns a number -999 if all channels are to be bias-corrected. It keeps UFO from
             # skipping any channel for bias correction.
-            if str_not_bias_corrected == "":
-                str_not_bias_corrected = "-999"
-            return str_not_bias_corrected
+            if not_bias_corrected == "":
+                not_bias_corrected = "-999"
+            return not_bias_corrected
         elif variable_name == 'biascorrtd':
             return ", ".join(str(element) for element in channel_bias_corrected)
         else:
