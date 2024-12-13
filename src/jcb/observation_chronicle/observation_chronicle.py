@@ -164,7 +164,12 @@ class ObservationChronicle():
         if variable_name == 'simulated':
             return ", ".join(str(element) for element in sat_simulated)
         elif variable_name == 'not_biascorrtd':
-            return ", ".join(str(element) for element in channel_not_bias_corrected)
+            str_not_bias_corrected = ", ".join(str(element) for element in channel_not_bias_corrected)
+            # Returns a number -999 if all channels are to be bias-corrected. It keeps UFO from 
+            # skipping any channel for bias correction.
+            if str_not_bias_corrected == "":
+                str_not_bias_corrected = "-999"
+            return str_not_bias_corrected
         elif variable_name == 'biascorrtd':
             return ", ".join(str(element) for element in channel_bias_corrected)
         else:
