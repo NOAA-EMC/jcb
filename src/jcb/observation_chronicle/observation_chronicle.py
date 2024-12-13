@@ -143,11 +143,11 @@ class ObservationChronicle():
 
         if variable_name == 'not_biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
-            channel_not_bias_corrected =
+            channel_not_bias_corrected = \
                     [channel for channel, values in sat_values.items() if not values[var_idx]]
         elif variable_name == 'biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
-            channel_bias_corrected =
+            channel_bias_corrected = \
                     [channel for channel, values in sat_values.items() if values[var_idx]]
         else:
             # Assert that variable_name is in the variables and get the index
