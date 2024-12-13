@@ -152,7 +152,7 @@ class ObservationChronicle():
         else:
             # Assert that variable_name is in the variables and get the index
             jcb.abort_if(variable_name not in sat_variables,
-                      f"Could not find '{variable_name}' in the variables for observer {observer}.")
+                         f"Could not find '{variable_name}' in the variables for observer {observer}.")
             var_idx = sat_variables.index(variable_name)
 
             # Set variables
