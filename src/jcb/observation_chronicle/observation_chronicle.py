@@ -143,16 +143,16 @@ class ObservationChronicle():
 
         if variable_name == 'not_biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
-            channel_not_bias_corrected = [channel for channel, values in sat_values.items() \
-                    if not values[var_idx]]
+            channel_not_bias_corrected = [channel for channel,
+                     values in sat_values.items() if not values[var_idx]]
         elif variable_name == 'biascorrtd':
             var_idx = sat_variables.index('biascorrtd')
-            channel_bias_corrected = [channel for channel, values in sat_values.items() \
-                    if values[var_idx]]
+            channel_bias_corrected = [channel for channel,
+                     values in sat_values.items() if values[var_idx]]
         else:
             # Assert that variable_name is in the variables and get the index
-            jcb.abort_if(variable_name not in sat_variables, \
-                    f"Could not find '{variable_name}' in the variables for observer {observer}.")
+            jcb.abort_if(variable_name not in sat_variables, 
+                     f"Could not find '{variable_name}' in the variables for observer {observer}.")
             var_idx = sat_variables.index(variable_name)
 
             # Set variables
