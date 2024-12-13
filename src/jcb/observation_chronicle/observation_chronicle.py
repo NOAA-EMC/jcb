@@ -141,19 +141,30 @@ class ObservationChronicle():
                      f"Could not find 'simulated' in the variables for observer {observer}.")
         sim_idx = sat_variables.index('simulated')
 
-        # Assert that variable_name is in the variables and get the index
-        jcb.abort_if(variable_name not in sat_variables,
-                     f"Could not find '{variable_name}' in the variables for observer {observer}.")
-        var_idx = sat_variables.index(variable_name)
+        if variable_name == 'not_biascorrtd':
+            var_idx = sat_variables.index('biascorrtd')
+            channel_not_bias_corrected = [channel for channel, values in sat_values.items() if not values[var_idx]]
+        elif variable_name == 'biascorrtd':
+            var_idx = sat_variables.index('biascorrtd')
+            channel_bias_corrected = [channel for channel, values in sat_values.items() if values[var_idx]]
+        else:
+            # Assert that variable_name is in the variables and get the index
+            jcb.abort_if(variable_name not in sat_variables,
+                         f"Could not find '{variable_name}' in the variables for observer {observer}.")
+            var_idx = sat_variables.index(variable_name)
 
-        # Set variables
-        sat_simulated = [channel for channel, values in sat_values.items() if values[sim_idx]]
-        sat_variable = [values[var_idx] for _, values in sat_values.items() if values[sim_idx]]
+            # Set variables
+            sat_simulated = [channel for channel, values in sat_values.items() if values[sim_idx]]
+            sat_variable = [values[var_idx] for _, values in sat_values.items() if values[sim_idx]]
 
         # Do not return lists, let the YAML developer decide if the variable should be a list or
         # not with use of [] in the YAML. Instead return a comma separated string
         if variable_name == 'simulated':
             return ", ".join(str(element) for element in sat_simulated)
+        elif variable_name == 'not_biascorrtd':
+            return ", ".join(str(element) for element in channel_not_bias_corrected)
+        elif variable_name == 'biascorrtd':
+            return ", ".join(str(element) for element in channel_bias_corrected)
         else:
             return ", ".join(str(element) for element in sat_variable)
 
