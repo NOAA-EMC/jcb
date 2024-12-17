@@ -167,7 +167,7 @@ class ObservationChronicle():
         elif variable_name == 'not_biascorrtd':
             not_bias_corrected = ", ".join(str(element) for element in channel_not_bias_corrected)
             # Returns a number -999 if all channels are to be bias-corrected. It keeps UFO from
-            # skipping any channel for bias correction.
+            # skipping bias correction for any channels.
             if not_bias_corrected == "":
                 not_bias_corrected = "-999"
             return not_bias_corrected
