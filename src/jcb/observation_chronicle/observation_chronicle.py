@@ -131,7 +131,7 @@ class ObservationChronicle():
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_satellite_variable(self, observer, variable_name):
+    def get_satellite_variable(self, observer, variable_name_in):
 
         # Get all the variables for the satellites
         sat_variables, sat_values = self.__process_satellite__(observer)
@@ -141,37 +141,39 @@ class ObservationChronicle():
                      f"Could not find 'simulated' in the variables for observer {observer}.")
         sim_idx = sat_variables.index('simulated')
 
-        if variable_name == 'not_biascorrtd':
-            var_idx = sat_variables.index('biascorrtd')
+        if variable_name_in == 'not_biascorrtd':
+            variable_name = 'biascorrtd'
+        else:
+            variable_name = variable_name_in
+        # Assert that variable_name is in the variables and get the index
+        jcb.abort_if(variable_name not in sat_variables,
+                     f"Could not find '{variable_name}' in "
+                     + "the variables for observer {observer}.")
+        var_idx = sat_variables.index(variable_name)
+
+        if variable_name_in == 'not_biascorrtd':
             channel_not_bias_corrected = \
                 [channel for channel, values in sat_values.items() if not values[var_idx]]
-        elif variable_name == 'biascorrtd':
-            var_idx = sat_variables.index('biascorrtd')
+        elif variable_name_in == 'biascorrtd':
             channel_bias_corrected = \
                 [channel for channel, values in sat_values.items() if values[var_idx]]
         else:
-            # Assert that variable_name is in the variables and get the index
-            jcb.abort_if(variable_name not in sat_variables,
-                         f"Could not find '{variable_name}' in "
-                         + "the variables for observer {observer}.")
-            var_idx = sat_variables.index(variable_name)
-
             # Set variables
             sat_simulated = [channel for channel, values in sat_values.items() if values[sim_idx]]
             sat_variable = [values[var_idx] for _, values in sat_values.items() if values[sim_idx]]
 
         # Do not return lists, let the YAML developer decide if the variable should be a list or
         # not with use of [] in the YAML. Instead return a comma separated string
-        if variable_name == 'simulated':
+        if variable_name_in == 'simulated':
             return ", ".join(str(element) for element in sat_simulated)
-        elif variable_name == 'not_biascorrtd':
+        elif variable_name_in == 'not_biascorrtd':
             not_bias_corrected = ", ".join(str(element) for element in channel_not_bias_corrected)
             # Returns a number -999 if all channels are to be bias-corrected. It keeps UFO from
             # skipping bias correction for any channels.
             if not_bias_corrected == "":
                 not_bias_corrected = "-999"
             return not_bias_corrected
-        elif variable_name == 'biascorrtd':
+        elif variable_name_in == 'biascorrtd':
             return ", ".join(str(element) for element in channel_bias_corrected)
         else:
             return ", ".join(str(element) for element in sat_variable)
