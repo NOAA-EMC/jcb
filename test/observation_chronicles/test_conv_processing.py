@@ -19,53 +19,27 @@ config_file = """
 # -------------------
 commissioned: 2009-04-14T00:00:00
 
-observer_type: satellite  # Type of chronicle to use
+observer_type: conventional  # Type of chronicle to use
 
-# Instrument initial configuration
+# observation type initial configuration
 # --------------------------------
-channel_variables:
-  simulated: min
-  active: min
-  error: max
-channel_values:
-  1:  [ 1,  1,  2.50 ]
-  2:  [ 1,  1,  2.20 ]
-  3:  [ 1,  1,  2.00 ]
-  4:  [ 1,  1,  0.55 ]
+reject_list: ['KBWI']
 
-# Chronicle of changes for this instrument
+# Chronicle of changes for this observation type
 # ----------------------------------------
 chronicles:
 
-- action_date: "2009-04-20T00:00:00"
-  justification: 'Example of making a channel inactive'
-  channel_values:
-    2:  [ 1,  -1,  2.20 ]
+- action_date: "2009-12-22T00:00:00"
+  justification: 'I do not like DCA anymore'
+  add_to_reject_list: ['KDCA']
 
-- action_date: "2009-04-22T00:00:00"
-  justification: 'Example of removing a channel completely'
-  channel_values:
-    4:  [ 0,  1,  0.55 ]
-
-- action_date: "2009-04-24T00:00:00"
-  justification: 'Example of deactivating all channels'
-  adjust_variable_for_all_channels:
-    variables: [simulated, active]
-    values: [0, -1]
-
-- action_date: "2009-04-26T00:00:00"
-  justification: 'Example of reactivating all channels'
-  revert_to_previous_date_time: "2009-04-23T00:00:00"  # Note that the datetime does not have
-                                                       # to match an action_date
-
-- action_date: "2009-04-28T00:00:00"
-  justification: 'Example of increasing error'
-  channel_values:
-    1:  [ 1,  1,  4.50 ]
+- action_date: "2009-12-25T00:00:00"
+  justification: 'I now like BWI'
+  remove_from_reject_list: ['KBWI']
 """
 
 # Read the YAML file into a dictionary
-satellite_chronicle = yaml.safe_load(config_file)
+conv_chronicle = yaml.safe_load(config_file)
 
 
 # --------------------------------------------------------------------------------------------------
