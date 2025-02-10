@@ -50,8 +50,8 @@ def test_window_before_chronicles():
     window_begin = datetime.fromisoformat("2009-04-15T00:00:00")
     window_final = datetime.fromisoformat("2009-04-15T06:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [1, 1, 2.5], 2: [1, 1, 2.2], 3: [1, 1, 2.0], 4: [1, 1, 0.55]}
@@ -66,8 +66,8 @@ def test_window_after_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [1, 1, 4.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
@@ -84,8 +84,8 @@ def test_window_straddles_chronicle():
     window_begin = datetime.fromisoformat("2009-04-19T21:00:00")
     window_final = datetime.fromisoformat("2009-04-20T03:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [1, 1, 2.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [1, 1, 0.55]}
@@ -96,8 +96,8 @@ def test_window_straddles_chronicle():
     window_begin = datetime.fromisoformat("2009-04-27T21:00:00")
     window_final = datetime.fromisoformat("2009-04-28T03:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [1, 1, 4.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
@@ -112,8 +112,8 @@ def test_everything_deactivated():
     window_begin = datetime.fromisoformat("2009-04-24T00:00:00")
     window_final = datetime.fromisoformat("2009-04-24T03:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [0, -1, 2.5], 2: [0, -1, 2.2], 3: [0, -1, 2.0], 4: [0, -1, 0.55]}
@@ -128,8 +128,8 @@ def test_still_deactivated():
     window_begin = datetime.fromisoformat("2009-04-25T18:00:00")
     window_final = datetime.fromisoformat("2009-04-26T00:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [0, -1, 2.5], 2: [0, -1, 2.2], 3: [0, -1, 2.0], 4: [0, -1, 0.55]}
@@ -144,8 +144,8 @@ def test_everything_reverted():
     window_begin = datetime.fromisoformat("2009-04-26T00:00:00")
     window_final = datetime.fromisoformat("2009-04-26T01:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
-                                                         satellite_chronicle)
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+                                                         conv_chronicle)
 
     # Check against expected output
     expected = {1: [1, 1, 2.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
@@ -158,13 +158,13 @@ def test_everything_reverted():
 def test_no_chronicles():
 
     # Copy the chronicle and remove the chronicles
-    no_chronicles = copy.deepcopy(satellite_chronicle)
+    no_chronicles = copy.deepcopy(conv_chronicle)
     del no_chronicles['chronicles']
 
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    _, channel_values = jcb.process_satellite_chronicles('test_sat', window_begin, window_final,
+    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
                                                          no_chronicles)
 
     # Check against expected output
