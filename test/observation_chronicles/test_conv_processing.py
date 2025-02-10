@@ -21,6 +21,8 @@ commissioned: 2009-04-14T00:00:00
 
 observer_type: conventional  # Type of chronicle to use
 
+window_option: max
+
 # observation type initial configuration
 # --------------------------------
 stations_to_reject: ['KBWI', 'KIAD']
@@ -36,6 +38,11 @@ chronicles:
 - action_date: "2009-12-25T00:00:00"
   justification: 'I now like BWI'
   remove_from_reject_list: ['KBWI']
+
+- action_date: "2009-12-26T00:00:00"
+  justification: 'I do not like CGS anymore'
+  add_to_reject_list: ['KCGS']
+
 """
 
 # Read the YAML file into a dictionary
@@ -50,12 +57,12 @@ def test_window_before_chronicles():
     window_begin = datetime.fromisoformat("2009-04-15T00:00:00")
     window_final = datetime.fromisoformat("2009-04-15T06:00:00")
 
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
                                                          conv_chronicle)
 
     # Check against expected output
-    expected = {1: [1, 1, 2.5], 2: [1, 1, 2.2], 3: [1, 1, 2.0], 4: [1, 1, 0.55]}
-    assert channel_values == expected
+    expected = ['KBWI', 'KIAD']
+    assert station_list == expected
 
 
 # --------------------------------------------------------------------------------------------------
@@ -66,12 +73,12 @@ def test_window_after_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
                                                          conv_chronicle)
 
     # Check against expected output
-    expected = {1: [1, 1, 4.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
-    assert channel_values == expected
+    expected = ['KIAD', 'KDCA', 'KCGS']
+    assert station_list == expected
 
 
 # --------------------------------------------------------------------------------------------------
@@ -79,77 +86,17 @@ def test_window_after_chronicles():
 
 def test_window_straddles_chronicle():
 
-    # With min strategy
-    # -----------------
-    window_begin = datetime.fromisoformat("2009-04-19T21:00:00")
-    window_final = datetime.fromisoformat("2009-04-20T03:00:00")
-
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
-
-    # Check against expected output
-    expected = {1: [1, 1, 2.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [1, 1, 0.55]}
-    assert channel_values == expected
-
     # With max strategy
     # -----------------
-    window_begin = datetime.fromisoformat("2009-04-27T21:00:00")
-    window_final = datetime.fromisoformat("2009-04-28T03:00:00")
+    window_begin = datetime.fromisoformat("2009-12-24T21:00:00")
+    window_final = datetime.fromisoformat("2009-12-25T03:00:00")
 
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
                                                          conv_chronicle)
 
     # Check against expected output
-    expected = {1: [1, 1, 4.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
-    assert channel_values == expected
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def test_everything_deactivated():
-
-    window_begin = datetime.fromisoformat("2009-04-24T00:00:00")
-    window_final = datetime.fromisoformat("2009-04-24T03:00:00")
-
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
-
-    # Check against expected output
-    expected = {1: [0, -1, 2.5], 2: [0, -1, 2.2], 3: [0, -1, 2.0], 4: [0, -1, 0.55]}
-    assert channel_values == expected
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def test_still_deactivated():
-
-    window_begin = datetime.fromisoformat("2009-04-25T18:00:00")
-    window_final = datetime.fromisoformat("2009-04-26T00:00:00")
-
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
-
-    # Check against expected output
-    expected = {1: [0, -1, 2.5], 2: [0, -1, 2.2], 3: [0, -1, 2.0], 4: [0, -1, 0.55]}
-    assert channel_values == expected
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def test_everything_reverted():
-
-    window_begin = datetime.fromisoformat("2009-04-26T00:00:00")
-    window_final = datetime.fromisoformat("2009-04-26T01:00:00")
-
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
-
-    # Check against expected output
-    expected = {1: [1, 1, 2.5], 2: [1, -1, 2.2], 3: [1, 1, 2.0], 4: [0, 1, 0.55]}
-    assert channel_values == expected
+    expected = ['KIAD', 'KDCA']
+    assert station_list == expected
 
 
 # --------------------------------------------------------------------------------------------------
@@ -164,12 +111,12 @@ def test_no_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    _, channel_values = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
                                                          no_chronicles)
 
     # Check against expected output
-    expected = {1: [1, 1, 2.5], 2: [1, 1, 2.2], 3: [1, 1, 2.0], 4: [1, 1, 0.55]}
-    assert channel_values == expected
+    expected = ['KBWI', 'KIAD']
+    assert station_list == expected
 
 
 # --------------------------------------------------------------------------------------------------

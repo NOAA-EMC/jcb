@@ -28,6 +28,7 @@ function_map = {
 
 # --------------------------------------------------------------------------------------------------
 
+
 def add_to_evolving_observing_system(evolving_observing_system, datetime, station_reject_list):
 
     """
@@ -56,6 +57,39 @@ def add_to_evolving_observing_system(evolving_observing_system, datetime, statio
 
 
 # --------------------------------------------------------------------------------------------------
+
+
+def get_left_index(error_message, action_dates, insert_point):
+
+    """
+    Get the index of the nearest action date that is before or equal to the insert point. This
+    function finds the index of the nearest action date that is before or equal to the insert point.
+    If the insert point is before the first action date then None is returned.
+
+    Args:
+        action_dates (list): A list of action dates.
+        insert_point (datetime): The insert point.
+
+    Returns:
+        int: The index of the nearest action date that is before or equal to the insert point.
+    """
+
+    # Abort if the insert point is before the first action date
+    jcb.abort_if(insert_point < action_dates[0],
+                 f"{error_message} The insert point is before the first action date.")
+
+    # Find the index of the nearest action date that is before or equal to the insert point
+    for index, action_date in enumerate(action_dates):
+        if action_date <= insert_point:
+            index_of_previous = index
+        else:
+            break
+
+    return index_of_previous
+
+
+# --------------------------------------------------------------------------------------------------
+
 
 def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in):
 
@@ -111,6 +145,9 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
                      "decommissioned date. This chronicle should not be used after the "
                      "decommissioned date.")
 
+    # Determine if the window spans multiple chronicles, which to adhere to
+    chronicle_func = function_map[chronicle['window_option']]
+
     # List of dictionaries to hold the observing system as it evolves through the chronicles
     # ----------------------------------------------------------------------------
     evolving_observing_system = []
@@ -153,6 +190,16 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
         errors_message_pre_ad = "Error processing observation chronicle with action date " + \
                                 f"{ch_action_date_iso} for {ob_type}:"
 
+        # If the chronicle has key add_to_reject_list
+        if 'add_to_reject_list' in chronicle:
+            add_list = chronicle['add_to_reject_list']
+            station_reject_list = station_reject_list + add_list
+
+        # If the chronicle has key remove_from_reject_list
+        if 'remove_from_reject_list' in chronicle:
+            remove_list = chronicle['remove_from_reject_list']
+            station_reject_list = [item for item in station_reject_list if item not in remove_list]
+
         # If the chronicle has key revert_to_previous_chronicle
         if 'revert_to_previous_date_time' in chronicle:
             previous_datetime = jcb.datetime_from_conf(chronicle['revert_to_previous_date_time'])
@@ -168,8 +215,40 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
         # Add the values after the action to the evolving observing system
         add_to_evolving_observing_system(evolving_observing_system, ch_action_date, station_reject_list)
 
-    print(station_reject_list)
+    # Now that the entire chronicle has been processed we can return the values to be used for
+    # the window. If the window beginning and ending are both between the same action dates then the
+    # values will be set to the earlier values. If the window straddles and action date then the
+    # values have to be determined using the min/max strategy that the user wishes and has chosen
+    # in the variables.
 
-    return []
+    # Ensure window_begin and window_final are datetime objects
+    window_begin = jcb.datetime_from_conf(window_begin)
+    window_final = jcb.datetime_from_conf(window_final)
+
+    # Sanity check on the expected input values
+    # -----------------------------------------
+    jcb.abort_if(window_begin < commissioned,
+                 f"{errors_message_pre} The window begin is before the commissioned date.")
+    jcb.abort_if(window_final < commissioned,
+                 f"{errors_message_pre} The window begin is before the commissioned date.")
+
+    # Abort if the window final is not after window begin
+    jcb.abort_if(window_final <= window_begin,
+                 f"{errors_message_pre} The window final must be after the window begin.")
+
+    # Find the index of the nearest actions_date that is before or equal to window begin
+    index_of_begin = get_left_index(errors_message_pre, action_dates, window_begin)
+
+    # Find the index of the nearest actions_date that is before or equal to window end
+    index_of_final = get_left_index(errors_message_pre, action_dates, window_final)
+
+    # Use strategy to determine list for the window
+    index_to_use = chronicle_func(index_of_begin, index_of_final)
+    final_station_list = copy.deepcopy(evolving_observing_system[index_to_use]['station_reject_list'])
+
+    print(final_station_list)
+
+    return final_station_list
+
 
 # --------------------------------------------------------------------------------------------------
