@@ -23,7 +23,7 @@ observer_type: conventional  # Type of chronicle to use
 
 # observation type initial configuration
 # --------------------------------
-reject_list: ['KBWI']
+stations_to_reject: ['KBWI', 'KIAD']
 
 # Chronicle of changes for this observation type
 # ----------------------------------------
