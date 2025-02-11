@@ -34,9 +34,9 @@ def add_to_evolving_observing_system(evolving_observing_system, datetime, statio
     """
     Add the rejected station IDs to the evolving observing system. This function is used to add the
     station IDs to the evolving observing system. The evolving observing system is a list of
-    dictionaries where each dictionary has a datetime key and a station_reject_list key. The datetime key
-    is a datetime object and the station_reject_list key is a list of strings of station IDs that
-    are to be rejected by quality control procedures.
+    dictionaries where each dictionary has a datetime key and a station_reject_list key.
+    The datetime key is a datetime object and the station_reject_list key is a list of strings
+    of station IDs that are to be rejected by quality control procedures.
 
     Args:
         evolving_observing_system (list): The evolving observing system.
@@ -111,16 +111,17 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     Returns:
         list: A list of strings of station IDs that should be included in a reject list
-              according to the specified time window and the strategies chosen for variable adjustments.
+              according to the specified time window and the strategies chosen
+              for variable adjustments.
 
     Raises:
         AbortException: If any of the preconditions are not met.
 
     Note:
         The function assumes that the station IDs are properly structured
-        in the input `chronicle` dictionary.    
+        in the input `chronicle` dictionary.
     """
-    
+
     # Copy the incoming chronicle to avoid modifying the original
     # -----------------------------------------------------------
     chronicle = copy.deepcopy(chronicle_in)
@@ -157,7 +158,7 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
     station_reject_list = chronicle.get('stations_to_reject')
 
     # Store chronicle at the initial commissioned date
-    add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)    
+    add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)
 
     # Get chronicles list
     # -------------------
@@ -213,7 +214,8 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
                 evolving_observing_system[index_of_previous]['station_reject_list'])
 
         # Add the values after the action to the evolving observing system
-        add_to_evolving_observing_system(evolving_observing_system, ch_action_date, station_reject_list)
+        add_to_evolving_observing_system(evolving_observing_system,
+                                         ch_action_date, station_reject_list)
 
     # Now that the entire chronicle has been processed we can return the values to be used for
     # the window. If the window beginning and ending are both between the same action dates then the
@@ -244,7 +246,8 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     # Use strategy to determine list for the window
     index_to_use = chronicle_func(index_of_begin, index_of_final)
-    final_station_list = copy.deepcopy(evolving_observing_system[index_to_use]['station_reject_list'])
+    final_station_list = \
+        copy.deepcopy(evolving_observing_system[index_to_use]['station_reject_list'])
 
     return final_station_list
 

@@ -58,7 +58,7 @@ def test_window_before_chronicles():
     window_final = datetime.fromisoformat("2009-04-15T06:00:00")
 
     station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
+                                                  conv_chronicle)
 
     # Check against expected output
     expected = ['KBWI', 'KIAD']
@@ -74,7 +74,7 @@ def test_window_after_chronicles():
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
     station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
+                                                  conv_chronicle)
 
     # Check against expected output
     expected = ['KIAD', 'KDCA', 'KCGS']
@@ -92,7 +92,7 @@ def test_window_straddles_chronicle():
     window_final = datetime.fromisoformat("2009-12-25T03:00:00")
 
     station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         conv_chronicle)
+                                                  conv_chronicle)
 
     # Check against expected output
     expected = ['KIAD', 'KDCA']
@@ -112,7 +112,7 @@ def test_no_chronicles():
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
     station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
-                                                         no_chronicles)
+                                                  no_chronicles)
 
     # Check against expected output
     expected = ['KBWI', 'KIAD']

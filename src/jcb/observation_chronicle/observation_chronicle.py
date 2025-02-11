@@ -122,7 +122,7 @@ class ObservationChronicle():
             jcb.abort_if(obs_chronicle['observer_type'] != 'conventional',
                          f"Only conventional observation types are supported. The observation type "
                          f"{observer} is listed as: {obs_chronicle['observer_type']}.")
-            
+
             # Process the chronicle for this observation type
             self.rejected_station_list = \
                 jcb.process_station_chronicles(observer, self.window_begin,
