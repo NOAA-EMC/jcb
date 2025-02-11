@@ -246,8 +246,6 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
     index_to_use = chronicle_func(index_of_begin, index_of_final)
     final_station_list = copy.deepcopy(evolving_observing_system[index_to_use]['station_reject_list'])
 
-    print(final_station_list)
-
     return final_station_list
 
 
