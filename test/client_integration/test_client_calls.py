@@ -28,18 +28,23 @@ def test_jcb():
     # ----------------------------------------------------------------------
     # Loop over apps
     for app in apps:
-        path = os.path.join(os.path.dirname(__file__), f'{app}-*-templates.yaml')
+        path = os.path.join(os.path.dirname(__file__), f'{app}-*.yaml')
         app_model_configs = glob.glob(path)
 
         # Loop over the configs, open and add for each supported_algorithm
         for app_model_config in app_model_configs:
 
+            print(f'Processing {app_model_config}')
+
             with open(app_model_config, 'r') as f:
                 dictionary_of_templates = yaml.safe_load(f)
 
             # Extract the supported_algorithms key and then remove that key from the dictionary
-            supported_algorithms = dictionary_of_templates['supported_algorithms']
-            del dictionary_of_templates['supported_algorithms']
+            if 'supported_algorithms' not in dictionary_of_templates:
+                supported_algorithms = [dictionary_of_templates['algorithm']]
+            else:
+                supported_algorithms = dictionary_of_templates['supported_algorithms']
+                del dictionary_of_templates['supported_algorithms']
 
             # Loop over the supported_algorithms
             for supported_algorithm in supported_algorithms:

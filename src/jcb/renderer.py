@@ -3,6 +3,7 @@
 
 import os
 
+import copy
 import jcb
 import jinja2 as j2
 import yaml
@@ -53,6 +54,11 @@ class Renderer():
 
         # Keep the dictionary of templates around
         self.template_dict = template_dict
+
+        # Optionally get the number of members (for ensemble based algorithms)
+        # --------------------------------------------------------------------
+        self.num_members = self.template_dict.get('number_ensemble_members', 1)
+        self.frst_member = self.template_dict.get('number_first_member', 1)
 
         # Set the paths where jinja will look for files in the hierarchy
         # --------------------------------------------------------------
@@ -188,52 +194,77 @@ class Renderer():
         # Make sure algorithm is in the template dictionary
         self.template_dict['algorithm'] = algorithm
 
-        # Render the template hierarchy
-        try:
-            jedi_dict_yaml = template.render(self.template_dict)
-        except j2.exceptions.UndefinedError as e:
-            print(f'Resolving templates for {algorithm} failed with the following exception: {e}')
-            return None
+        # List of JEDI dictionaries for each member
+        jedi_dicts = {'members': []}
 
-        # Check that everything was rendered
-        jcb.abort_if('{{' in jedi_dict_yaml, f'In template_string_jinja2 '
-                     f'the output string still contains template directives. '
-                     f'{jedi_dict_yaml}')
+        # Loop over the members
+        for member in range(self.num_members):
 
-        jcb.abort_if('}}' in jedi_dict_yaml, f'In template_string_jinja2 '
-                     f'the output string still contains template directives. '
-                     f'{jedi_dict_yaml}')
+            # Convert template dictionary to string (YAML)
+            template_dict_str = yaml.dump(self.template_dict)
 
-        # print(' ')
+            # Dictionary containing just member number
+            member_dict = {'member': member + self.frst_member}
 
-        # Convert string form of the dictionary to a dictionary
-        jedi_dict = yaml.safe_load(jedi_dict_yaml)
+            # Run jinja2 on template_dict_str to complete {{member}} template
+            template_dict_str = j2.Template(template_dict_str).render(member_dict)
 
-        # Clean up the observers part of the dictionary if necessary. Should only have the
-        # components that the algorithm allows for.
-        # --------------------------------------------------------------------------------
-        if algorithm in self.observer_components:
-            # Get the observer components for this algorithm
-            observer_location = self.observer_components[algorithm]['observer_nesting']
-            allowable_keys = self.observer_components[algorithm]['components']
+            # Convert back to dictionary
+            template_dict_rendered = yaml.safe_load(template_dict_str)
 
-            # Pointer to observers (mutable list so should not copy here)
-            observers = get_nested_dict(jedi_dict, observer_location)
+            # Render the template hierarchy
+            try:
+                jedi_dict_yaml = template.render(template_dict_rendered)
+            except j2.exceptions.UndefinedError as e:
+                print(f'Resolving templates for {algorithm} failed with the following exception: {e}')
+                return None
 
-            # Loop over the observers and remove the non allowable components
-            for observer in observers:
+            # Check that everything was rendered
+            jcb.abort_if('{{' in jedi_dict_yaml, f'In template_string_jinja2 '
+                         f'the output string still contains template directives. '
+                         f'{jedi_dict_yaml}')
 
-                observer_keys = observer.keys()
+            jcb.abort_if('}}' in jedi_dict_yaml, f'In template_string_jinja2 '
+                         f'the output string still contains template directives. '
+                         f'{jedi_dict_yaml}')
 
-                # Find the observer components that are not allowable
-                keys_to_remove = [key for key in observer_keys if key not in allowable_keys]
+            # print(' ')
 
-                # Remove the non allowable components
-                for key in keys_to_remove:
-                    del observer[key]
+            # Convert string form of the dictionary to a dictionary
+            jedi_dict = yaml.safe_load(jedi_dict_yaml)
 
-        # Convert the rendered string to a dictionary
-        return jedi_dict
+            # Clean up the observers part of the dictionary if necessary. Should only have the
+            # components that the algorithm allows for.
+            # --------------------------------------------------------------------------------
+            if algorithm in self.observer_components:
+                # Get the observer components for this algorithm
+                observer_location = self.observer_components[algorithm]['observer_nesting']
+                allowable_keys = self.observer_components[algorithm]['components']
+
+                # Pointer to observers (mutable list so should not copy here)
+                observers = get_nested_dict(jedi_dict, observer_location)
+
+                # Loop over the observers and remove the non allowable components
+                for observer in observers:
+
+                    observer_keys = observer.keys()
+
+                    # Find the observer components that are not allowable
+                    keys_to_remove = [key for key in observer_keys if key not in allowable_keys]
+
+                    # Remove the non allowable components
+                    for key in keys_to_remove:
+                        del observer[key]
+
+            # Add to the list
+            jedi_dicts['members'].append(jedi_dict)
+
+        # If there is only one member return the first element of the list
+        # otherwise return the ensemble application ready dictionary
+        if self.num_members == 1:
+            return jedi_dicts['members'][0]
+        else:
+            return jedi_dicts
 
 
 # --------------------------------------------------------------------------------------------------
