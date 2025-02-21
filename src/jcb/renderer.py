@@ -167,7 +167,8 @@ class Renderer():
                 self.env.globals['get_satellite_variable'] = self.obs_chron.get_satellite_variable
 
                 # Add global functions for retrieving conventional station reject lists
-                self.env.globals['get_conventional_rejected_stations'] = self.obs_chron.get_conventional_rejected_stations
+                self.env.globals['get_conventional_rejected_stations'] = \
+                    self.obs_chron.get_conventional_rejected_stations
 
     # ----------------------------------------------------------------------------------------------
 
