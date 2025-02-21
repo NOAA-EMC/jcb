@@ -5,6 +5,7 @@ import os
 
 from .observation_chronicle.observation_chronicle import ObservationChronicle
 from .observation_chronicle.satellite_chronicle import process_satellite_chronicles
+from .observation_chronicle.conv_chronicle import process_station_chronicles
 from .renderer import render as render
 from .renderer import Renderer as Renderer
 from .utilities.config_parsing import datetime_from_conf, duration_from_conf
@@ -33,6 +34,7 @@ __all__ = [
     'render',
     'ObservationChronicle',
     'process_satellite_chronicles',
+    'process_station_chronicles',
     'datetime_from_conf',
     'duration_from_conf',
     'parse_channels',

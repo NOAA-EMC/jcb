@@ -80,6 +80,11 @@ class ObservationChronicle():
             return False
 
         # Observation type dependent checks
+        if obs_chronicle['observer_type'] == 'conventional':
+            # need to check the use of individual stations/locations
+            if not self.get_conventional_rejected_stations(observer):
+                return False
+
         if obs_chronicle['observer_type'] == 'satellite':
 
             # If there are no simulated channels then return False
@@ -89,6 +94,45 @@ class ObservationChronicle():
         # If made it through all the checks then the data is active and should be used
         # ----------------------------------------------------------------------------
         return True
+
+    # ----------------------------------------------------------------------------------------------
+
+    def __process_conventional_stations__(self, observer):
+
+        # Only re-process the chronicle if the observer has changed
+        if self.last_observer != observer:
+
+            # Check that there is a chronicle for this type
+            jcb.abort_if(observer not in self.chronicles,
+                         f"No chronicle found for observation type {observer}. However templates "
+                         f"in the observation file require a chronicle.")
+
+            # Get the chronicle for the observation type
+            obs_chronicle = self.chronicles[observer]
+
+            # Abort if the window begin is after the decommissioned date
+            decommissioned_str = obs_chronicle.get('decommissioned', None)
+            if decommissioned_str:
+                decommissioned = jcb.datetime_from_conf(decommissioned_str)
+                jcb.abort_if(self.window_begin >= decommissioned,
+                             f"The window begin is after the decommissioned date for "
+                             f"observation type {observer}.")
+
+            # Abort if the type is not conventional
+            jcb.abort_if(obs_chronicle['observer_type'] != 'conventional',
+                         f"Only conventional observation types are supported. The observation type "
+                         f"{observer} is listed as: {obs_chronicle['observer_type']}.")
+
+            # Process the chronicle for this observation type
+            self.rejected_station_list = \
+                jcb.process_station_chronicles(observer, self.window_begin,
+                                               self.window_final, obs_chronicle)
+
+            # Update the last observer
+            self.last_observer = observer
+
+        # Return the requested data
+        return self.rejected_station_list
 
     # ----------------------------------------------------------------------------------------------
 
@@ -128,6 +172,16 @@ class ObservationChronicle():
 
         # Return the requested data
         return self.sat_variables, self.sat_values
+
+    # ----------------------------------------------------------------------------------------------
+
+    def get_conventional_rejected_stations(self, observer):
+
+        # Get all the rejected stations for the observation type
+        station_list = self.__process_conventional_stations__(observer)
+
+        # force a return of a list of strings since the station IDs have to be strings
+        return station_list
 
     # ----------------------------------------------------------------------------------------------
 
