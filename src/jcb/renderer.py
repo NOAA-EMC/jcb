@@ -216,7 +216,7 @@ class Renderer():
             try:
                 jedi_dict_yaml = template.render(template_dict_rendered)
             except j2.exceptions.UndefinedError as e:
-                print(f'Resolving templates for {algorithm} failed with the following exception: {e}')
+                print(f'Resolving templates for {algorithm} failed with exception: {e}')
                 return None
 
             # Check that everything was rendered
