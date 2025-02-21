@@ -3,7 +3,6 @@
 
 import os
 
-import copy
 import jcb
 import jinja2 as j2
 import yaml
