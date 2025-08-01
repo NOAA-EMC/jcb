@@ -2,9 +2,8 @@
 
 
 import os
-
-
 from functools import partial
+
 import jcb
 import jinja2 as j2
 
