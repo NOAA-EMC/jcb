@@ -6,7 +6,6 @@ from functools import partial
 
 import jcb
 import jinja2 as j2
-
 import yaml
 from jinja2 import Template
 
