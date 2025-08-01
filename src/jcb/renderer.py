@@ -32,7 +32,8 @@ def get_nested_dict(nested_dict, keys):
 # --------------------------------------------------------------------------------------------------
 
 
-def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=None, script_input=None):
+def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=None, 
+        script_input=None):
     """
     Return obs engine based on if the file exists or not.
     """
@@ -48,8 +49,8 @@ def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=No
             }
         else:
             msg = (
-            f'{filename} does not exist and either script_path or script_input is '
-            'not assigned correctly'
+                f'{filename} does not exist and either script_path or script_input is '
+                'not assigned correctly'
             )
             raise FileNotFoundError(msg)
 
