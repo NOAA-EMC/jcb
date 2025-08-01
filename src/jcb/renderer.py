@@ -43,7 +43,7 @@ def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=No
         if script_path and script_input:
             obs_engine = {
                 'type': 'script',
-                'script file': f'{script_path}bufr_{observation.split("_")[0]}.py',
+                'script file': os.path.join(script_path, f'{observation.split("_")[0]}.py'),
                 'args': {'input': script_input},
                 'category': observation.split('_')[-1]
             }
