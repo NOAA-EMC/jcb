@@ -32,6 +32,28 @@ def get_nested_dict(nested_dict, keys):
 # --------------------------------------------------------------------------------------------------
 
 
+def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=None, script_input=None):
+    """
+    Return True if the file does NOT exist, else False.
+    The file path is constructed as: path/prefix + observation + suffix
+    """
+    filename = os.path.join(obs_path, f"{obs_prefix}{observation}{obs_suffix}")
+    obs_engine = dict(type='H5File', obsfile=filename)
+    if not os.path.exists(filename):
+        if script_path and script_input:
+            obs_engine = {
+                'type': 'script',
+                'script file': f'{script_path}bufr_{observation.split("_")[0]}.py',
+                'args': {'input': script_input},
+                'category': observation.split('_')[-1]
+            }
+        else:
+            msg = f'{filename} is not existed and either script_path or script_input is not assigned correctly'
+            raise Exception(msg)
+
+    return obs_engine
+
+
 class Renderer():
 
     """
@@ -169,6 +191,9 @@ class Renderer():
                 # Add global functions for retrieving conventional station reject lists
                 self.env.globals['get_conventional_rejected_stations'] = \
                     self.obs_chron.get_conventional_rejected_stations
+
+                # Add global functions for testing if the file existed
+                self.env.globals['get_obs_engine'] = get_obs_engine
 
     # ----------------------------------------------------------------------------------------------
 
