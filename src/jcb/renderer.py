@@ -5,9 +5,9 @@ import os
 
 import jcb
 import jinja2 as j2
+from functools import partial
 import yaml
 
-from functools import partial
 from jinja2 import Template
 
 # --------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=No
             script_path_template = Template(script_path)
             script_input_str = script_input_template.render(**kwargs)
             script_path_str = script_path_template.render(**kwargs)
-            obs_engine  = {
+            obs_engine = {
                 'type': 'script',
                 'script file': os.path.join(script_path_str, f'{observation.split("_")[0]}.py'),
                 'args': {'input': script_input_str},
