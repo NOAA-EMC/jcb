@@ -35,7 +35,7 @@ def get_nested_dict(nested_dict, keys):
 def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=None,
                    script_input=None):
     """
-    Return obs engine based on if the file exists or not.
+    Return obs engine based on whether the file exists or not.
     """
     filename = os.path.join(obs_path, f"{obs_prefix}{observation}{obs_suffix}")
     obs_engine = dict(type='H5File', obsfile=filename)
