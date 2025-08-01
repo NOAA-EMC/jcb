@@ -7,6 +7,8 @@ import jcb
 import jinja2 as j2
 import yaml
 
+from functools import partial
+from jinja2 import Template
 
 # --------------------------------------------------------------------------------------------------
 
@@ -33,7 +35,7 @@ def get_nested_dict(nested_dict, keys):
 
 
 def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=None,
-                   script_input=None):
+                   script_input=None, **kwargs):
     """
     Return obs engine based on whether the file exists or not.
     """
@@ -41,10 +43,14 @@ def get_obs_engine(observation, obs_path, obs_prefix, obs_suffix, script_path=No
     obs_engine = dict(type='H5File', obsfile=filename)
     if not os.path.exists(filename):
         if script_path and script_input:
-            obs_engine = {
+            script_input_template = Template(script_input)
+            script_path_template = Template(script_path)
+            script_input_str = script_input_template.render(**kwargs)
+            script_path_str = script_path_template.render(**kwargs)
+            obs_engine  = {
                 'type': 'script',
-                'script file': os.path.join(script_path, f'{observation.split("_")[0]}.py'),
-                'args': {'input': script_input},
+                'script file': os.path.join(script_path_str, f'{observation.split("_")[0]}.py'),
+                'args': {'input': script_input_str},
                 'category': observation.split('_')[-1]
             }
         else:
@@ -196,7 +202,7 @@ class Renderer():
                     self.obs_chron.get_conventional_rejected_stations
 
                 # Add global functions for testing if the file existed
-                self.env.globals['get_obs_engine'] = get_obs_engine
+                self.env.globals['get_obs_engine'] = partial(get_obs_engine, **self.template_dict)
 
     # ----------------------------------------------------------------------------------------------
 
