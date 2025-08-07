@@ -261,7 +261,6 @@ class Renderer():
                 obs_engine = dict(type='H5File', obsfile=obsdatain_filename)
             else:
                 if obsdatain_script_path and script_input:
-
                     obs_engine = {
                         'type': 'script',
                         'script file': os.path.join(obsdatain_script_path,
@@ -275,7 +274,8 @@ class Renderer():
             jcb.abort(
                 f"Missing or invalid input: obsdatain_path={obsdatain_path}, "
                 f"prefix={obsdatain_prefix}, suffix={obsdatain_suffix}, "
-                f"script_path={obsdatain_script_path}, or file not found: {obsdatain_filename}"
+                f"script_path={obsdatain_script_path}, or file not found: "
+                f"{obsdatain_filename if obsdatain_filename is not None else 'N/A'}"
             )
 
 # --------------------------------------------------------------------------------------------------
