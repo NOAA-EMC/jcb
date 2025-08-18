@@ -6,6 +6,14 @@
 
 ### Installation
 
+For released versions, install directly from PyPI:
+
+``` shell
+pip install jcb
+```
+
+For development or to install from source:
+
 ``` shell
 git clone https://github.com/noaa-emc/jcb
 cd jcb
