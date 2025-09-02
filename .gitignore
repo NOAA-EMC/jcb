@@ -1,6 +1,7 @@
 # JCB clients
 src/jcb/configuration/algorithms/
 src/jcb/configuration/apps/gdas/
+src/jcb/configuration/apps/rdas/
 test/client_integration/*yaml
 
 # Mac files
