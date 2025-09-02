@@ -170,6 +170,9 @@ class Renderer():
                 self.env.globals['get_conventional_rejected_stations'] = \
                     self.obs_chron.get_conventional_rejected_stations
 
+                # Add global functions for testing if the file existed
+                self.env.globals['get_obs_engine'] = self.get_obs_engine
+
     # ----------------------------------------------------------------------------------------------
 
     def render(self, algorithm):
@@ -240,6 +243,40 @@ class Renderer():
         # Convert the rendered string to a dictionary
         return jedi_dict
 
+    def get_obs_engine(self, observation, component, script_input=None):
+        """
+        Return obs engine based on whether the file exists or not.
+        """
+        obsdatain_path = self.template_dict.get(f'{component}_obsdatain_path', None)
+        obsdatain_prefix = self.template_dict.get(f'{component}_obsdatain_prefix', None)
+        obsdatain_suffix = self.template_dict.get(f'{component}_obsdatain_suffix', None)
+        obsdatain_script_path = self.template_dict.get(f'{component}_obsdatain_script_path', None)
+        obs_engine = None
+        if obsdatain_path and obsdatain_prefix and obsdatain_suffix:
+            obsdatain_filename = os.path.join(
+                obsdatain_path,
+                f"{obsdatain_prefix}{observation}{obsdatain_suffix}"
+            )
+            if os.path.exists(obsdatain_filename):
+                obs_engine = dict(type='H5File', obsfile=obsdatain_filename)
+            else:
+                if obsdatain_script_path and script_input:
+                    obs_engine = {
+                        'type': 'script',
+                        'script file': os.path.join(obsdatain_script_path,
+                                                    f'{observation.split("_")[0]}.py'),
+                        'args': {'input': script_input},
+                        'category': observation.split('_')[-1]
+                    }
+        if obs_engine:
+            return obs_engine
+        else:
+            jcb.abort(
+                f"Missing or invalid input: obsdatain_path={obsdatain_path}, "
+                f"prefix={obsdatain_prefix}, suffix={obsdatain_suffix}, "
+                f"script_path={obsdatain_script_path}, or file not found: "
+                f"{obsdatain_filename if obsdatain_filename is not None else 'N/A'}"
+            )
 
 # --------------------------------------------------------------------------------------------------
 

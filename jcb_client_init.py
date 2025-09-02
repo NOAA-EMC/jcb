@@ -36,11 +36,16 @@ def write_message(message: str, center: bool = False) -> None:
     max_line_length = 100
 
     # Break the message into a list of lines max 100 characters but do not cut a word in half
+    # Unless a word itself is longer than 100 characters, then force cut.
     lines = []
     while len(message) > max_line_length:
         last_space = message[:max_line_length].rfind(' ')
-        lines.append(message[:last_space])
-        message = message[last_space+1:]
+        if last_space == -1:  # no space found, force cut
+            lines.append(message[:max_line_length])
+            message = message[max_line_length:]
+        else:
+            lines.append(message[:last_space])
+            message = message[last_space+1:]
     lines.append(message)
 
     # If center is true center the lines
