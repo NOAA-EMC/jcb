@@ -78,9 +78,17 @@ class Renderer():
 
             # Check if app_path_algorithm is an absolute path
             if os.path.isabs(app_path_algorithm):
-                self.j2_search_paths += [app_path_algorithm]
+                abs_path = app_path_algorithm
             else:
-                self.j2_search_paths += [os.path.join(config_path, 'apps', app_path_algorithm)]
+                abs_path = os.path.join(config_path, 'apps', app_path_algorithm)
+
+            # Add the app_path_algorithm to the search paths
+            self.j2_search_paths += [abs_path]
+
+            # Add subdirectories of app_path_algorithm to the search paths
+            for root, dirs, files in os.walk(abs_path):
+                for dir_name in dirs:
+                    self.j2_search_paths += [os.path.join(root, dir_name)]
 
         # Path with model files if app needs model things
         app_path_model = self.template_dict.get('app_path_model')
@@ -92,24 +100,41 @@ class Renderer():
 
             # Check if app_path_model is an absolute path
             if os.path.isabs(app_path_model):
-                self.j2_search_paths += [app_path_model]
+                abs_path = app_path_model
             else:
-                self.j2_search_paths += [os.path.join(config_path, 'apps', app_path_model)]
+                abs_path = os.path.join(config_path, 'apps', app_path_model)
+
+            # Add the app_path_model to the search paths
+            self.j2_search_paths += [abs_path]     
+
+            # Add subdirectories of app_path_model to the search paths
+            for root, dirs, files in os.walk(abs_path):
+                for dir_name in dirs:
+                    self.j2_search_paths += [os.path.join(root, dir_name)]
 
         # Path with observation files if app needs obs things
         app_path_observations = self.template_dict.get('app_path_observations')
         if app_path_observations:
 
             if os.path.isabs(app_path_observations):
-                obs_path = app_path_observations
+                abs_path = app_path_observations
             else:
-                obs_path = os.path.join(config_path, 'apps', app_path_observations)
+                abs_path = os.path.join(config_path, 'apps', app_path_observations)
 
-            self.j2_search_paths += [obs_path]
+            # Add the app_path_observations to the search paths
+            self.j2_search_paths += [abs_path]
 
-            # Get a list of all the observation files that end in .yaml.j2
-            obs_files = [f for f in os.listdir(obs_path) if
-                         os.path.isfile(os.path.join(obs_path, f)) and f.endswith('.yaml.j2')]
+            # Add subdirectories of app_path_observations to the search paths
+            obs_files = []
+            for root, dirs, files in os.walk(abs_path):
+                for dir_name in dirs:
+                    subdir_abs_path = os.path.join(root, dir_name)
+
+                    self.j2_search_paths += [subdir_abs_path]
+
+                    # Get a list of all the observation files that end in .yaml.j2
+                    obs_files += [f for f in os.listdir(subdir_abs_path) if
+                                  os.path.isfile(os.path.join(subdir_abs_path, f)) and f.endswith('.yaml.j2')]
 
             # Remove the .yaml.j2 extension from the observation list
             all_observations = [f[:-8] for f in obs_files]
