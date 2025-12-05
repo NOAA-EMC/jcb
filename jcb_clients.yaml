@@ -2,6 +2,6 @@ gdas:
   git_url: noaa-emc/jcb-gdas
   git_ref: develop
 
-rdas:
-  git_url: noaa-emc/jcb-rdas
-  git_ref: develop
+#rdas:
+#  git_url: noaa-emc/jcb-rdas
+#  git_ref: develop
