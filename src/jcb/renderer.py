@@ -250,7 +250,7 @@ class Renderer():
                 # Get list of observations
                 obs_names = self.template_dict['observations']
 
-                # Get list of observations that have their filters replaces
+                # Get list of observations that have their filters replaced
                 obs_to_replace = replace_obs_filters_dict['observations']
 
                 # New filter dictionary
