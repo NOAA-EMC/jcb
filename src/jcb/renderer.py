@@ -266,9 +266,9 @@ class Renderer():
                     if obs_name not in obs_to_replace:
                         continue
 
-                    # Remove any instance of obs fiters, obs prior filters, obs post filters, obs pre filters
+                    # Remove any instance of filters
                     for filter_key in ['obs filters', 'obs prior filters',
-                                        'obs post filters', 'obs pre filters']:
+                                       'obs post filters', 'obs pre filters']:
                         if filter_key in observer:
                             del observer[filter_key]
 
@@ -315,7 +315,9 @@ class Renderer():
                 f"{obsdatain_filename if obsdatain_filename is not None else 'N/A'}"
             )
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 def render(template_dict: dict):
 
