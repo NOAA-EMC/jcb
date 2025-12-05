@@ -240,8 +240,41 @@ class Renderer():
                 for key in keys_to_remove:
                     del observer[key]
 
+            # Option to completely override all filters for a list of observations
+            # --------------------------------------------------------------------
+            if 'replace_obs_filters' in self.template_dict:
+
+                # Get dictionary replace_obs_filters
+                replace_obs_filters_dict = self.template_dict['replace_obs_filters']
+
+                # Get list of observations
+                obs_names = self.template_dict['observations']
+
+                # Get list of observations that have their filters replaced
+                obs_to_replace = replace_obs_filters_dict['observations']
+
+                # New filter dictionary
+                new_filters = replace_obs_filters_dict.get('override_filters', {})
+
+                # Loop over the observers and replace filters for matching observations
+                for observer, obs_name in zip(observers, obs_names):
+                    # Check whether to replace filters for this observation
+                    if obs_name not in obs_to_replace:
+                        continue
+
+                    # Remove any instance of filters
+                    for filter_key in ['obs filters', 'obs prior filters',
+                                       'obs post filters', 'obs pre filters']:
+                        if filter_key in observer:
+                            del observer[filter_key]
+
+                    # Set new entry obs filters with the replace dictionary
+                    observer['obs filters'] = new_filters
+
         # Convert the rendered string to a dictionary
         return jedi_dict
+
+# --------------------------------------------------------------------------------------------------
 
     def get_obs_engine(self, observation, component, script_input=None):
         """
@@ -277,6 +310,7 @@ class Renderer():
                 f"script_path={obsdatain_script_path}, or file not found: "
                 f"{obsdatain_filename if obsdatain_filename is not None else 'N/A'}"
             )
+
 
 # --------------------------------------------------------------------------------------------------
 
