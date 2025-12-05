@@ -257,11 +257,7 @@ class Renderer():
                 new_filters = replace_obs_filters_dict.get('override_filters', {})
 
                 # Loop over the observers and replace filters for matching observations
-                for index, observer in enumerate(observers):
-
-                    # Get the obs name based on the list of observations
-                    obs_name = obs_names[index]
-
+                for observer, obs_name in zip(observers, obs_names):
                     # Check whether to replace filters for this observation
                     if obs_name not in obs_to_replace:
                         continue
