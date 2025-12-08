@@ -271,6 +271,33 @@ class Renderer():
                     # Set new entry obs filters with the replace dictionary
                     observer['obs filters'] = new_filters
 
+            if 'local_ensemble_da' == self.template_dict['algorithm']:
+                try:
+                # Get dictionary letkf_obs_dist_loc_configs
+                letkf_obs_dist_loc_configs_dict = self.template_dict['letkf_obs_dist_loc_configs']
+
+                # Get list of observations
+                obs_names = self.template_dict['observations']
+
+                # Get list of observations that have their filters replaced
+                obs_to_replace = letkf_obs_dist_loc_configs_dict['observations']
+
+                # Get obs_distribution and obs_localizations
+                obs_distibution = letkf_obs_dist_loc_configs.get('obs_distibution', {})
+                obs_localizations = letkf_obs_dist_loc_configs.get('obs_localizations', {})
+
+                # Loop over the observers and replace filters for matching observations
+                for observer, obs_name in zip(observers, obs_names):
+                    # Check whether to apply letkf_obs_dist_loc_configs for this observation
+                    if obs_name not in obs_to_replace:
+                        continue
+                    observer['obs space']['distribution'] = obs_distribution
+                    observer['obs localizations'] = obs_localizations
+
+                except Exception as e:
+                    msg = f'Resolving templates for {algorithm} failed with the following exception:\n{e}'
+                    print(msg)
+                    raise Exception(msg) from e
         # Convert the rendered string to a dictionary
         return jedi_dict
 
