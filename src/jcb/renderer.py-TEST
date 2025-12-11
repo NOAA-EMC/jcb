@@ -33,7 +33,7 @@ def get_nested_dict(nested_dict, keys):
 
 
 class Renderer():
-
+    print(f'HBO-100-Enter-RendererClass')
     """
     A class to render templates using Jinja2 based on a provided dictionary of templates.
 
@@ -43,6 +43,7 @@ class Renderer():
     """
 
     def __init__(self, template_dict: dict):
+        print(f'HBO-101-Enter-RendererClassInit')
 
         """
         Initializes the Renderer with a given template dictionary and sets up Jinja2 search paths.
@@ -173,9 +174,11 @@ class Renderer():
                 # Add global functions for testing if the file existed
                 self.env.globals['get_obs_engine'] = self.get_obs_engine
 
+        print(f'HBO-101-Exit-RendererClassInit')
     # ----------------------------------------------------------------------------------------------
 
     def render(self, algorithm):
+        print(f'HBO-102-Enter-RendererClassRender1')
 
         """
         Renders a given algorithm.
@@ -194,6 +197,8 @@ class Renderer():
 
         # Make sure algorithm is in the template dictionary
         self.template_dict['algorithm'] = algorithm
+        print(f'HBO-102-template-{template}')
+        print(f'HBO-102-algorithm-{algorithm}')
 
         # Render the template hierarchy
         try:
@@ -203,6 +208,7 @@ class Renderer():
             print(msg)
             raise Exception(msg) from e
 
+        print(f'HBO-102-jedi_dict_yaml-{jedi_dict_yaml}')
         # Check that everything was rendered
         jcb.abort_if('{{' in jedi_dict_yaml, f'In template_string_jinja2 '
                      f'the output string still contains template directives. '
@@ -216,15 +222,17 @@ class Renderer():
 
         # Convert string form of the dictionary to a dictionary
         jedi_dict = yaml.safe_load(jedi_dict_yaml)
+        print(f'HBO-102-jedi_dict-{jedi_dict}')
+        print(f'HBO-102-observer_components-{self.observer_components}')
 
         # Clean up the observers part of the dictionary if necessary. Should only have the
         # components that the algorithm allows for.
         # --------------------------------------------------------------------------------
-        # Rename algorithm when running local_ensemble_da_observer and local_ensemble_da_solver
-        # to use local_ensemble_da configs in observer_components
         if 'local_ensemble_da' in algorithm:
+            print(f'HBO-102-changeAlgorithm')
             algorithm = 'local_ensemble_da'
         if algorithm in self.observer_components:
+            print(f'HBO-102-EnterObserver_components')
             # Get the observer components for this algorithm
             observer_location = self.observer_components[algorithm]['observer_nesting']
             allowable_keys = self.observer_components[algorithm]['components']
@@ -232,6 +240,7 @@ class Renderer():
             # Pointer to observers (mutable list so should not copy here)
             observers = get_nested_dict(jedi_dict, observer_location)
 
+            print(f'HBO-102-observers-before-{observers}')
             # Loop over the observers and remove the non allowable components
             for observer in observers:
 
@@ -244,6 +253,7 @@ class Renderer():
                 for key in keys_to_remove:
                     del observer[key]
 
+            print(f'HBO-102-observers-after-{observers}')
             # Option to completely override all filters for a list of observations
             # --------------------------------------------------------------------
             if 'replace_obs_filters' in self.template_dict:
@@ -275,51 +285,37 @@ class Renderer():
                     # Set new entry obs filters with the replace dictionary
                     observer['obs filters'] = new_filters
 
-            # Option to add or override obs distribution and obs localizations 
-            # in local_ensemble_da
+            # Option to add obs distribution and obs localizations for a list of observations
+            # in local_ensemble_da applications
             # --------------------------------------------------------------------
+            print(f'HBO-102-BeforeAlgorithm-{algorithm}')
             if 'local_ensemble_da' in algorithm:
-                # Currently for the atmosphere only
-                # Get dictionary obs_distribution_localizations
-                if 'obs_distribution_localizations' in self.template_dict:
-                    obs_dist_loc_dict = self.template_dict['obs_distribution_localizations']
+                print(f'HBO-102-EnterAlgorithm-{algorithm}')
+                # Get dictionary atm_ens_obs_dist_localize
+                atm_ens_obs_dist_localize_dict = self.template_dict['atm_ens_obs_dist_localize']
 
-                    # Get list of observations
-                    obs_names = self.template_dict['observations']
+                # Get list of observations
+                obs_names = self.template_dict['observations']
 
-                    # Get obs_distribution and obs_localizations
-                    obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
-                    obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
+                # Get obs_distribution and obs_localizations
+                obs_distribution = atm_ens_obs_dist_localize_dict.get('obs_distribution', {})
+                obs_localizations = atm_ens_obs_dist_localize_dict.get('obs_localizations', {})
 
-                    # Loop over the observers and add obs distribution and localizations
-                    for observer, obs_name in zip(observers, obs_names):
-                        observer['obs space']['distribution'] = obs_dist
-                        observer['obs localizations'] = obs_loc
-
-                    # Override obs distribution and localizations for matching observations
-                    if 'override_obs_distribution_localizations' in self.template_dict:
-                        override_obs_dist_loc_dict = self.template_dict['override_obs_distribution_localizations']
-                        if override_obs_dist_loc_dict['override']:
-                            del override_obs_dist_loc_dict['override']
-                            obs_to_override = override_obs_dist_loc_dict.keys()
-                            for observer, obs_name in zip(observers, obs_names):
-                                if obs_name not in obs_to_override:
-                                    continue
-                                obs_dist_loc_dict = override_obs_dist_loc_dict.get(obs_name, {})
-                                obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
-                                obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
-                                observer['obs space']['distribution'] = obs_dist
-                                observer['obs localizations'] = obs_loc
-                else:
-                    print(f'WARNING: obs_distribution_localizations in local_ensemble_da is currently not')
-                    print(f'         implemented in jcb for this application (only atmosphere now)')
-                            
+                print(f'HBO-102-obs_names-{obs_names}')
+               # Loop over the observers and replace filters for matching observations
+                for observer, obs_name in zip(observers, obs_names):
+                    # Check whether to localize this observation
+                    print(f'HBO102-add dist and localize')
+                    observer['obs space']['distribution'] = obs_distribution
+                    observer['obs localizations'] = obs_localizations
         # Convert the rendered string to a dictionary
+        print(f'HBO-102-Exit-RendererClassRender1')
         return jedi_dict
 
 # --------------------------------------------------------------------------------------------------
 
     def get_obs_engine(self, observation, component, script_input=None):
+        print(f'HBO-103-Enter-RendererClassGetObsEngine')
         """
         Return obs engine based on whether the file exists or not.
         """
@@ -355,10 +351,12 @@ class Renderer():
             )
 
 
+        print(f'HBO-103-Exit-RendererClassGetObsEngine')
 # --------------------------------------------------------------------------------------------------
 
 
 def render(template_dict: dict):
+    print(f'HBO-104-Enter-RendererClassRender2')
 
     """
     Creates JEDI executable using only a dictionary of templates.
@@ -384,6 +382,7 @@ def render(template_dict: dict):
     algorithm = template_dict['algorithm']
 
     # Render the jcb object
+    print(f'HBO-104-Exit-RendererClassRender2')
     return jcb_object.render(algorithm)
 
 
