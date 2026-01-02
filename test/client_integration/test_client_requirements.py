@@ -242,6 +242,7 @@ def test_client_allowable_components():
         '.github',
         'model',
         'observations',
+        'observation_statistics',
         'algorithm',
         'observation_chronicle',
         'test',
