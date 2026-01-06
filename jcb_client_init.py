@@ -234,13 +234,16 @@ if __name__ == "__main__":
         for key in required_keys:
             if key not in app_conf:
                 raise Exception(f'Key \'{key}\' not found in jcb_apps.yaml')
+        if 'app_subdir' not in app_conf:
+            app_conf['app_subdir'] = ''
         app_conf['target_path'] = os.path.join(jcb_config_path, 'apps', app)
 
     # Add jcb-algorithms to the dictionary
     jcb_apps['algorithms'] = {
         'git_url': 'noaa-emc/jcb-algorithms',
         'git_ref': 'develop',
-        'target_path': os.path.join(jcb_config_path, 'algorithms')
+        'app_subdir': '',
+        'target_path': os.path.join(jcb_config_path, 'algorithms'),
     }
 
     # Update the default refs for the clients
@@ -251,7 +254,7 @@ if __name__ == "__main__":
 
     # Link all the application test YAML files to client_integration test directory
     for app, app_conf in jcb_apps.items():
-        test_path = os.path.join(app_conf['target_path'], 'test', 'client_integration')
+        test_path = os.path.join(app_conf['target_path'], app_conf['app_subdir'], 'test', 'client_integration')
         if not os.path.exists(test_path):
             continue
         yaml_files = [f for f in os.listdir(test_path) if f.endswith('.yaml')]
