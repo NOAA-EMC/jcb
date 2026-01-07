@@ -179,6 +179,10 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
     for app, app_conf in jcb_apps.items():
 
         target_path = app_conf['target_path']
+        if app_config['app_subdir'] == '':
+            clone_path = target_path
+        else:
+            clone_path = target_path + '_temp'
 
         # Check if the target path exists
         if not os.path.exists(target_path):
@@ -186,12 +190,20 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
             # Clone command
             full_url = f'https://github.com/{app_conf["git_url"]}.git'
             git_clone = ['git', 'clone', full_url, '-b', app_conf['git_ref'],
-                         target_path]
+                         clone_path]
 
             # Clone the repository
             command_string = ' '.join(git_clone)
             write_message(f'Cloning {app} with command: {command_string}')
             subprocess.run(git_clone, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+            if app_conf['app_subdir'] != '':
+                copy = ['cp', '-r', os.path.join(clone_path, app_conf['app_subdir']), target_path]
+
+                # Copy the subdirectory to the target path
+                command_string = ' '.join(copy)
+                write_message(f'Copying {app} subdirectory with command: {command_string}')
+                subprocess.run(copy, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         else:
 
@@ -254,7 +266,7 @@ if __name__ == "__main__":
 
     # Link all the application test YAML files to client_integration test directory
     for app, app_conf in jcb_apps.items():
-        test_path = os.path.join(app_conf['target_path'], app_conf['app_subdir'], 'test', 'client_integration')
+        test_path = os.path.join(app_conf['target_path'], 'test', 'client_integration')
         if not os.path.exists(test_path):
             continue
         yaml_files = [f for f in os.listdir(test_path) if f.endswith('.yaml')]
