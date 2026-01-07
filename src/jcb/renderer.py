@@ -275,7 +275,7 @@ class Renderer():
                     # Set new entry obs filters with the replace dictionary
                     observer['obs filters'] = new_filters
 
-            # Option to add or override obs distribution and obs localizations 
+            # Option to add or override obs distribution and obs localizations
             # in local_ensemble_da
             # --------------------------------------------------------------------
             if 'local_ensemble_da' in algorithm:
@@ -298,7 +298,8 @@ class Renderer():
 
                     # Override obs distribution and localizations for matching observations
                     if 'override_obs_distribution_localizations' in self.template_dict:
-                        override_obs_dist_loc_dict = self.template_dict['override_obs_distribution_localizations']
+                        override_obs_dist_loc_dict = self.template_dict[
+                                                     'override_obs_distribution_localizations']
                         if override_obs_dist_loc_dict['override']:
                             del override_obs_dist_loc_dict['override']
                             obs_to_override = override_obs_dist_loc_dict.keys()
@@ -311,9 +312,10 @@ class Renderer():
                                 observer['obs space']['distribution'] = obs_dist
                                 observer['obs localizations'] = obs_loc
                 else:
-                    print(f'WARNING: obs_distribution_localizations in local_ensemble_da is currently not')
-                    print(f'         implemented in jcb for this application (only atmosphere now)')
-                            
+                    print('WARNING: obs_distribution_localizations in local_ensemble_da is')
+                    print('         currently not implemented in jcb for this application')
+                    print('         (only foratmoshere now).')
+
         # Convert the rendered string to a dictionary
         return jedi_dict
 
