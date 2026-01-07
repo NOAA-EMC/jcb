@@ -180,8 +180,11 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
 
         target_path = app_conf['target_path']
         if app_conf['app_subdir'] == '':
+            # If jcb app is its own repo, clone directly to target path
             clone_path = target_path
         else:
+            # if jcb app is a subdirectory of a larger repo, clone to a temp location first
+
             # Get the path of this file
             file_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -203,6 +206,7 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
             write_message(f'Cloning {app} with command: {command_string}')
             subprocess.run(git_clone, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+            # If app_subdir is set, copy the jcb app subdirectory to the target path
             if app_conf['app_subdir'] != '':
                 copy = ['cp', '-rf', os.path.join(clone_path, app_conf['app_subdir']), target_path]
 
