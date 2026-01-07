@@ -208,13 +208,11 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
 
             # If app_subdir is set, copy the jcb app subdirectory to the target path
             if app_conf['app_subdir'] != '':
-                copy = ['cp', '-rf', os.path.join(clone_path, app_conf['app_subdir']), target_path]
-
-                # Copy the subdirectory to the target path
-                command_string = ' '.join(copy)
-                write_message(f'Copying {app} subdirectory with command: {command_string}')
-                subprocess.run(copy, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
+                shutil.copytree(
+                    os.path.join(clone_path, app_conf['app_subdir']),
+                    target_path,
+                    dirs_exist_ok=True  # Python 3.8+
+                )
         else:
 
             # Print warning that repo is already cloned
