@@ -182,10 +182,16 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
         if app_conf['app_subdir'] == '':
             clone_path = target_path
         else:
-            clone_path = target_path + '_parent_repo'
+            # Get the path of this file
+            file_path = os.path.dirname(os.path.realpath(__file__))
+
+            # Set the path to where the applications will be cloned
+            jcb_config_path = os.path.join(file_path, 'src', 'jcb', 'configuration')
+
+            clone_path = os.path.join(jcb_config_path, f"{app}_parent_repo")
 
         # Check if the target path exists
-        if not os.path.exists(target_path):
+        if not os.path.exists(clone_path):
 
             # Clone command
             full_url = f'https://github.com/{app_conf["git_url"]}.git'
@@ -198,7 +204,7 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
             subprocess.run(git_clone, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             if app_conf['app_subdir'] != '':
-                copy = ['cp', '-r', os.path.join(clone_path, app_conf['app_subdir']), target_path]
+                copy = ['cp', '-rf', os.path.join(clone_path, app_conf['app_subdir']), target_path]
 
                 # Copy the subdirectory to the target path
                 command_string = ' '.join(copy)
