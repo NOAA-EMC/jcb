@@ -188,7 +188,7 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
             # Get the path of this file
             file_path = os.path.dirname(os.path.realpath(__file__))
 
-            # Set the path to where the applications will be cloned
+            # Set the path to where the parent repos will be cloned
             jcb_config_path = os.path.join(file_path, 'src', 'jcb', 'configuration')
 
             clone_path = os.path.join(jcb_config_path, f"{app}_parent_repo")
