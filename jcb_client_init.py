@@ -179,10 +179,10 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
     for app, app_conf in jcb_apps.items():
 
         target_path = app_conf['target_path']
-        if app_config['app_subdir'] == '':
+        if app_conf['app_subdir'] == '':
             clone_path = target_path
         else:
-            clone_path = target_path + '_temp'
+            clone_path = target_path + '_parent_repo'
 
         # Check if the target path exists
         if not os.path.exists(target_path):
