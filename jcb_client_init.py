@@ -5,6 +5,7 @@
 
 
 import os
+import shutil
 import subprocess
 import typing
 
@@ -179,20 +180,40 @@ def clone_or_update_repos(jcb_apps: typing.Dict[str, typing.Dict[str, typing.Any
     for app, app_conf in jcb_apps.items():
 
         target_path = app_conf['target_path']
+        if app_conf['app_subdir'] == '':
+            # If jcb app is its own repo, clone directly to target path
+            clone_path = target_path
+        else:
+            # if jcb app is a subdirectory of a larger repo, clone to a temp location first
+
+            # Get the path of this file
+            file_path = os.path.dirname(os.path.realpath(__file__))
+
+            # Set the path to where the parent repos will be cloned
+            jcb_config_path = os.path.join(file_path, 'src', 'jcb', 'configuration')
+
+            clone_path = os.path.join(jcb_config_path, f"{app}_parent_repo")
 
         # Check if the target path exists
-        if not os.path.exists(target_path):
+        if not os.path.exists(clone_path):
 
             # Clone command
             full_url = f'https://github.com/{app_conf["git_url"]}.git'
             git_clone = ['git', 'clone', full_url, '-b', app_conf['git_ref'],
-                         target_path]
+                         clone_path]
 
             # Clone the repository
             command_string = ' '.join(git_clone)
             write_message(f'Cloning {app} with command: {command_string}')
             subprocess.run(git_clone, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+            # If app_subdir is set, copy the jcb app subdirectory to the target path
+            if app_conf['app_subdir'] != '':
+                shutil.copytree(
+                    os.path.join(clone_path, app_conf['app_subdir']),
+                    target_path,
+                    dirs_exist_ok=True  # Python 3.8+
+                )
         else:
 
             # Print warning that repo is already cloned
@@ -234,13 +255,16 @@ if __name__ == "__main__":
         for key in required_keys:
             if key not in app_conf:
                 raise Exception(f'Key \'{key}\' not found in jcb_apps.yaml')
+        if 'app_subdir' not in app_conf:
+            app_conf['app_subdir'] = ''
         app_conf['target_path'] = os.path.join(jcb_config_path, 'apps', app)
 
     # Add jcb-algorithms to the dictionary
     jcb_apps['algorithms'] = {
         'git_url': 'noaa-emc/jcb-algorithms',
         'git_ref': 'develop',
-        'target_path': os.path.join(jcb_config_path, 'algorithms')
+        'app_subdir': '',
+        'target_path': os.path.join(jcb_config_path, 'algorithms'),
     }
 
     # Update the default refs for the clients
