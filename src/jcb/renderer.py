@@ -32,6 +32,28 @@ def get_nested_dict(nested_dict, keys):
 # --------------------------------------------------------------------------------------------------
 
 
+def to_plain_dict(obj):
+    """
+    Recursively convert any dict-like object (e.g., wxflow attrdict) to a plain dict.
+    Also handles lists containing dicts.
+
+    Args:
+        obj: Object to convert (dict, list, or other)
+
+    Returns:
+        Plain Python dict, list, or the original object if neither
+    """
+    if isinstance(obj, dict):
+        return {k: to_plain_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [to_plain_dict(item) for item in obj]
+    else:
+        return obj
+
+
+# --------------------------------------------------------------------------------------------------
+
+
 class Renderer():
 
     """
@@ -257,8 +279,10 @@ class Renderer():
                 # Get list of observations that have their filters replaced
                 obs_to_replace = replace_obs_filters_dict['observations']
 
-                # New filter dictionary
-                new_filters = replace_obs_filters_dict.get('override_filters', {})
+                # New filter list (default to empty list, not dict)
+                new_filters = replace_obs_filters_dict.get('override_filters', [])
+                # Convert to plain dicts to avoid wxflow attrdict issues
+                new_filters = to_plain_dict(new_filters)
 
                 # Loop over the observers and replace filters for matching observations
                 for observer, obs_name in zip(observers, obs_names):
