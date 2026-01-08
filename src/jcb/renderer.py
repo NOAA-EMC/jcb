@@ -220,6 +220,10 @@ class Renderer():
         # Clean up the observers part of the dictionary if necessary. Should only have the
         # components that the algorithm allows for.
         # --------------------------------------------------------------------------------
+        # Rename algorithm when running local_ensemble_da_observer and local_ensemble_da_solver
+        # to use local_ensemble_da configs in observer_components
+        if 'local_ensemble_da' in algorithm:
+            algorithm = 'local_ensemble_da'
         if algorithm in self.observer_components:
             # Get the observer components for this algorithm
             observer_location = self.observer_components[algorithm]['observer_nesting']
@@ -270,6 +274,47 @@ class Renderer():
 
                     # Set new entry obs filters with the replace dictionary
                     observer['obs filters'] = new_filters
+
+            # Option to add or override obs distribution and obs localizations
+            # in local_ensemble_da
+            # --------------------------------------------------------------------
+            if 'local_ensemble_da' in algorithm:
+                # Currently for the atmosphere only
+                # Get dictionary obs_distribution_localizations
+                if 'obs_distribution_localizations' in self.template_dict:
+                    obs_dist_loc_dict = self.template_dict['obs_distribution_localizations']
+
+                    # Get list of observations
+                    obs_names = self.template_dict['observations']
+
+                    # Get obs_distribution and obs_localizations
+                    obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
+                    obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
+
+                    # Loop over the observers and add obs distribution and localizations
+                    for observer, obs_name in zip(observers, obs_names):
+                        observer['obs space']['distribution'] = obs_dist
+                        observer['obs localizations'] = obs_loc
+
+                    # Override obs distribution and localizations for matching observations
+                    if 'override_obs_distribution_localizations' in self.template_dict:
+                        override_obs_dist_loc_dict = self.template_dict[
+                                                     'override_obs_distribution_localizations']
+                        if override_obs_dist_loc_dict['override']:
+                            del override_obs_dist_loc_dict['override']
+                            obs_to_override = override_obs_dist_loc_dict.keys()
+                            for observer, obs_name in zip(observers, obs_names):
+                                if obs_name not in obs_to_override:
+                                    continue
+                                obs_dist_loc_dict = override_obs_dist_loc_dict.get(obs_name, {})
+                                obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
+                                obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
+                                observer['obs space']['distribution'] = obs_dist
+                                observer['obs localizations'] = obs_loc
+                else:
+                    print('WARNING: obs_distribution_localizations in local_ensemble_da is')
+                    print('         currently not implemented in jcb for this application')
+                    print('         (only foratmoshere now).')
 
         # Convert the rendered string to a dictionary
         return jedi_dict
