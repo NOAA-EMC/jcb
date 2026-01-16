@@ -18,6 +18,8 @@ def get_apps():
     apps_path = os.path.join(jcb_path, 'configuration', 'apps')
 
     # Return list of apps
+    print(f"foo {jcb_path}")
+    print(f"bar {os.listdir(jcb_path)}")
     return [app for app in os.listdir(apps_path) if os.path.isdir(os.path.join(apps_path, app))]
 
 
