@@ -273,9 +273,6 @@ class Renderer():
                 # Get dictionary replace_obs_filters
                 replace_obs_filters_dict = self.template_dict['replace_obs_filters']
 
-                # Get list of observations
-                obs_names = self.template_dict['observations']
-
                 # Get list of observations that have their filters replaced
                 obs_to_replace = replace_obs_filters_dict['observations']
 
@@ -283,7 +280,10 @@ class Renderer():
                 new_filters = replace_obs_filters_dict.get('override_filters', {})
 
                 # Loop over the observers and replace filters for matching observations
-                for observer, obs_name in zip(observers, obs_names):
+                for observer in observers:
+                    # Get the observer name from the rendered observer
+                    obs_name = observer['obs space']['name']
+
                     # Check whether to replace filters for this observation
                     if obs_name not in obs_to_replace:
                         continue
@@ -306,15 +306,12 @@ class Renderer():
                 if 'obs_distribution_localizations' in self.template_dict:
                     obs_dist_loc_dict = self.template_dict['obs_distribution_localizations']
 
-                    # Get list of observations
-                    obs_names = self.template_dict['observations']
-
                     # Get obs_distribution and obs_localizations
                     obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                     obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
 
                     # Loop over the observers and add obs distribution and localizations
-                    for observer, obs_name in zip(observers, obs_names):
+                    for observer in observers:
                         observer['obs space']['distribution'] = obs_dist
                         observer['obs localizations'] = obs_loc
 
@@ -325,7 +322,8 @@ class Renderer():
                         if override_obs_dist_loc_dict['override']:
                             del override_obs_dist_loc_dict['override']
                             obs_to_override = override_obs_dist_loc_dict.keys()
-                            for observer, obs_name in zip(observers, obs_names):
+                            for observer in observers:
+                                obs_name = observer['obs space']['name']
                                 if obs_name not in obs_to_override:
                                     continue
                                 obs_dist_loc_dict = override_obs_dist_loc_dict.get(obs_name, {})
