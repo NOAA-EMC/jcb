@@ -6,7 +6,6 @@ import os
 import jcb
 import jinja2 as j2
 import yaml
-
 from jcb.observation_chronicle.conv_chronicle import StationID
 
 

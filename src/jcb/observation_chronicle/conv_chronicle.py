@@ -14,15 +14,19 @@ quotes for strings that it deems unambiguous values.
 Add a StationID subclass and representer to force the use of quotes.
 """
 # --------------------------------------------------------------------------------------------------
+
+
 class StationID(str):
     """Str subclass to force PyYAML to retain/write out as strings."""
     pass
+
 
 def _stationid_representer(dumper, data):
     return dumper.represent_scalar(
         yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
         str(data),
         style="'")
+
 
 yaml.SafeDumper.add_representer(StationID, _stationid_representer)
 
@@ -31,16 +35,16 @@ def test_station_id_yaml_emission_uses_quoted_strings():
     """Regression test: StationID values must be emitted with quotes by the CLI dumper."""
     document = {
         'station_reject_list': [
-            StationID('00123'),
-            StationID('ABC'),
+            StationID('01001'),
+            StationID('01008'),
         ]
     }
 
     dumped = yaml.dump(document, Dumper=yaml.SafeDumper, sort_keys=False)
 
     assert "station_reject_list:" in dumped
-    assert "- '00123'" in dumped
-    assert "- 'ABC'" in dumped
+    assert "- '01001'" in dumped
+    assert "- '01008'" in dumped
 yaml.Dumper.add_representer(StationID, _stationid_representer)
 # --------------------------------------------------------------------------------------------------
 
