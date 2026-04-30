@@ -36,7 +36,7 @@ def get_nested_dict(nested_dict, keys):
 
 def _retype_station_id_lists(obj):
     """
-    Re-type stations in reject lost to StationID type, as type is lost somewhere along the way.
+    Re-type stations in reject list to StationID type, as type is lost somewhere along the way.
     """
     if isinstance(obj, dict):
         if (isinstance(obj.get('variable'), dict)

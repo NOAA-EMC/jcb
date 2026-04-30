@@ -9,9 +9,9 @@ import yaml
 
 
 """
-We need the output yaml to have quote marks on stationIDS. PyYAML will only use
-quotes on strings that it deems un-ambiguous values.
-Add stationID method and representer to force use of quotes.
+We need the output YAML to include quote marks around station IDs. PyYAML will only use
+quotes for strings that it deems unambiguous values.
+Add a StationID subclass and representer to force the use of quotes.
 """
 # --------------------------------------------------------------------------------------------------
 class StationID(str):
@@ -25,6 +25,22 @@ def _stationid_representer(dumper, data):
         style="'")
 
 yaml.SafeDumper.add_representer(StationID, _stationid_representer)
+
+
+def test_station_id_yaml_emission_uses_quoted_strings():
+    """Regression test: StationID values must be emitted with quotes by the CLI dumper."""
+    document = {
+        'station_reject_list': [
+            StationID('00123'),
+            StationID('ABC'),
+        ]
+    }
+
+    dumped = yaml.dump(document, Dumper=yaml.SafeDumper, sort_keys=False)
+
+    assert "station_reject_list:" in dumped
+    assert "- '00123'" in dumped
+    assert "- 'ABC'" in dumped
 yaml.Dumper.add_representer(StationID, _stationid_representer)
 # --------------------------------------------------------------------------------------------------
 
