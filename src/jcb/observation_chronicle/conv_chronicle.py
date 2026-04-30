@@ -25,6 +25,7 @@ def _stationid_representer(dumper, data):
         style="'")
 
 yaml.SafeDumper.add_representer(StationID, _stationid_representer)
+yaml.Dumper.add_representer(StationID, _stationid_representer)
 # --------------------------------------------------------------------------------------------------
 
 """
