@@ -46,6 +46,8 @@ def test_station_id_yaml_emission_uses_quoted_strings():
     assert "- '01001'" in dumped
     assert "- '01008'" in dumped
 yaml.Dumper.add_representer(StationID, _stationid_representer)
+
+
 # --------------------------------------------------------------------------------------------------
 
 """

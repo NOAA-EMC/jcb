@@ -335,7 +335,6 @@ class Renderer():
                     print('         currently not implemented in jcb for this application')
                     print('         (only foratmoshere now).')
 
-
         _retype_station_id_lists(jedi_dict)
 
         # Convert the rendered string to a dictionary
