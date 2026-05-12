@@ -5,6 +5,47 @@ import copy
 from datetime import datetime
 
 import jcb
+import yaml
+
+
+"""
+We need the output YAML to include quote marks around station IDs. PyYAML will only use
+quotes for strings that it deems unambiguous values.
+Add a StationID subclass and representer to force the use of quotes.
+"""
+# --------------------------------------------------------------------------------------------------
+
+
+class StationID(str):
+    """Str subclass to force PyYAML to retain/write out as strings."""
+    pass
+
+
+def _stationid_representer(dumper, data):
+    return dumper.represent_scalar(
+        yaml.resolver.BaseResolver.DEFAULT_SCALAR_TAG,
+        str(data),
+        style="'")
+
+
+yaml.SafeDumper.add_representer(StationID, _stationid_representer)
+yaml.Dumper.add_representer(StationID, _stationid_representer)
+
+
+def test_station_id_yaml_emission_uses_quoted_strings():
+    """Regression test: StationID values must be emitted with quotes by the CLI dumper."""
+    document = {
+        'station_reject_list': [
+            StationID('01001'),
+            StationID('01008'),
+        ]
+    }
+
+    dumped = yaml.dump(document, Dumper=yaml.SafeDumper, sort_keys=False)
+
+    assert "station_reject_list:" in dumped
+    assert "- '01001'" in dumped
+    assert "- '01008'" in dumped
 
 
 # --------------------------------------------------------------------------------------------------
@@ -24,7 +65,6 @@ function_map = {
     'min': min,
     'max': max,
 }
-
 
 # --------------------------------------------------------------------------------------------------
 
@@ -121,7 +161,6 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
         The function assumes that the station IDs are properly structured
         in the input `chronicle` dictionary.
     """
-
     # Copy the incoming chronicle to avoid modifying the original
     # -----------------------------------------------------------
     chronicle = copy.deepcopy(chronicle_in)
@@ -155,8 +194,7 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     # Initial list of stations to reject
     # ----------------------------------
-    station_reject_list = chronicle.get('stations_to_reject')
-
+    station_reject_list = [StationID(s) for s in chronicle.get('stations_to_reject') or []]
     # Store chronicle at the initial commissioned date
     add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)
 
@@ -193,12 +231,12 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
         # If the chronicle has key add_to_reject_list
         if 'add_to_reject_list' in chronicle:
-            add_list = chronicle['add_to_reject_list']
+            add_list = [StationID(s) for s in chronicle['add_to_reject_list']]
             station_reject_list = station_reject_list + add_list
 
         # If the chronicle has key remove_from_reject_list
         if 'remove_from_reject_list' in chronicle:
-            remove_list = chronicle['remove_from_reject_list']
+            remove_list = [StationID(s) for s in chronicle['remove_from_reject_list']]
             station_reject_list = [item for item in station_reject_list if item not in remove_list]
 
         # If the chronicle has key revert_to_previous_chronicle

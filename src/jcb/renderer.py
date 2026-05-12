@@ -6,6 +6,7 @@ import os
 import jcb
 import jinja2 as j2
 import yaml
+from jcb.observation_chronicle.conv_chronicle import StationID
 
 
 # --------------------------------------------------------------------------------------------------
@@ -27,6 +28,26 @@ def get_nested_dict(nested_dict, keys):
     for key in keys:
         nested_dict = nested_dict[key]  # Navigate deeper into the dictionary
     return nested_dict
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def _retype_station_id_lists(obj):
+    """
+    Re-type stations in reject list to StationID type, as type is lost somewhere along the way.
+    """
+    if isinstance(obj, dict):
+        if (isinstance(obj.get('variable'), dict)
+                and obj['variable'].get('name') == 'MetaData/stationIdentification'
+                and isinstance(obj.get('is_in'), list)):
+            obj['is_in'] = [StationID(s) if isinstance(s, str) else s
+                            for s in obj['is_in']]
+        for v in obj.values():
+            _retype_station_id_lists(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            _retype_station_id_lists(item)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -313,6 +334,8 @@ class Renderer():
                     print('WARNING: obs_distribution_localizations in local_ensemble_da is')
                     print('         currently not implemented in jcb for this application')
                     print('         (only foratmoshere now).')
+
+        _retype_station_id_lists(jedi_dict)
 
         # Convert the rendered string to a dictionary
         return jedi_dict
