@@ -82,7 +82,11 @@ class ObservationChronicle():
         # Observation type dependent checks
         if obs_chronicle['observer_type'] == 'conventional':
             # need to check the use of individual stations/locations
-            if not self.get_conventional_rejected_stations(observer):
+            stations_to_reject = obs_chronicle.get('stations_to_reject', {})
+            variables = [name for name in stations_to_reject.keys() if name != 'All']
+
+            if not any(self.get_conventional_rejected_stations(observer, variable)
+                       for variable in variables):
                 return False
 
         if obs_chronicle['observer_type'] == 'satellite':
@@ -97,10 +101,10 @@ class ObservationChronicle():
 
     # ----------------------------------------------------------------------------------------------
 
-    def __process_conventional_stations__(self, observer):
+    def __process_conventional_stations__(self, observer, variable_name):
 
-        # Only re-process the chronicle if the observer has changed
-        if self.last_observer != observer:
+        # Only re-process the chronicle if the observer or variable has changed
+        if self.last_observer != observer or getattr(self, 'last_conventional_variable', None) != variable_name:
 
             # Check that there is a chronicle for this type
             jcb.abort_if(observer not in self.chronicles,
@@ -125,11 +129,12 @@ class ObservationChronicle():
 
             # Process the chronicle for this observation type
             self.rejected_station_list = \
-                jcb.process_station_chronicles(observer, self.window_begin,
+                jcb.process_station_chronicles(observer, variable_name, self.window_begin,
                                                self.window_final, obs_chronicle)
 
             # Update the last observer
             self.last_observer = observer
+            self.last_conventional_variable = variable_name
 
         # Return the requested data
         return self.rejected_station_list
@@ -175,10 +180,10 @@ class ObservationChronicle():
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_conventional_rejected_stations(self, observer):
+    def get_conventional_rejected_stations(self, observer, variable_name):
 
         # Get all the rejected stations for the observation type
-        station_list = self.__process_conventional_stations__(observer)
+        station_list = self.__process_conventional_stations__(observer, variable_name)
 
         # force a return of a list of strings since the station IDs have to be strings
         return station_list
