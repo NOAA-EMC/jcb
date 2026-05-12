@@ -74,8 +74,8 @@ def _as_station_id_list(station_entries, variable_name, ob_type=''):
     """
     Normalize station entries into a list of StationID values for a given variable.
 
-    Station entries must be a dictionary with optional 'All' and variable-specific keys.
-    Returns the merged list of all-applicable stations and variable-specific stations.
+    Station entries must be a dictionary, with 'All' and/or variable-specific keys.
+    Returns the merged list of All + variable_specific stations.
     """
     if not station_entries:
         return []
@@ -89,8 +89,7 @@ def _as_station_id_list(station_entries, variable_name, ob_type=''):
     if all_entries or var_entries:
         print(f"Observer {ob_type}, variable {variable_name}: "
               f"{len(all_entries)} stations rejected from 'All', "
-              f"{len(var_entries)} from '{variable_name}'-specific "
-              f"({len(all_entries) + len(var_entries)} total)")
+              f"{len(var_entries)} from '{variable_name}' "
     return [StationID(s) for s in all_entries + var_entries]
 
 
