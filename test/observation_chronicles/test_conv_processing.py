@@ -61,8 +61,8 @@ def test_window_before_chronicles():
     window_begin = datetime.fromisoformat("2009-04-15T00:00:00")
     window_final = datetime.fromisoformat("2009-04-15T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
-                                                  conv_chronicle)
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin,
+                                                  window_final, conv_chronicle)
 
     # Check against expected output
     expected = ['KBWI', 'KIAD']
@@ -77,8 +77,8 @@ def test_window_after_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
-                                                  conv_chronicle)
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin,
+                                                  window_final, conv_chronicle)
 
     # Check against expected output
     expected = ['KIAD', 'KDCA', 'KCGS']
@@ -95,8 +95,8 @@ def test_window_straddles_chronicle():
     window_begin = datetime.fromisoformat("2009-12-24T21:00:00")
     window_final = datetime.fromisoformat("2009-12-25T03:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
-                                                  conv_chronicle)
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin,
+                                                  window_final, conv_chronicle)
 
     # Check against expected output
     expected = ['KIAD', 'KDCA']
@@ -115,8 +115,8 @@ def test_no_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
-                                                  no_chronicles)
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin,
+                                                  window_final, no_chronicles)
 
     # Check against expected output
     expected = ['KBWI', 'KIAD']
