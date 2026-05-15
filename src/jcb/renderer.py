@@ -32,7 +32,8 @@ def get_nested_dict(nested_dict, keys):
 
 # --------------------------------------------------------------------------------------------------
 
-IODA_STATION_ID_VARNAME='MetaData/stationIdentification'
+IODA_STATION_ID_VARNAME = 'MetaData/stationIdentification'
+
 
 def _retype_station_id_lists(obj):
     """

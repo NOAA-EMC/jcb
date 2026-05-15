@@ -104,8 +104,8 @@ class ObservationChronicle():
     def __process_conventional_stations__(self, observer, variable_name):
 
         # Only re-process the chronicle if the observer or variable has changed
-        if self.last_observer != observer or 
-                getattr(self, 'last_conventional_variable', None) != variable_name:
+        if self.last_observer != observer 
+                or getattr(self, 'last_conventional_variable', None) != variable_name:
 
             # Check that there is a chronicle for this type
             jcb.abort_if(observer not in self.chronicles,

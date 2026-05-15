@@ -225,7 +225,7 @@ def process_station_chronicles(ob_type, variable_name, window_begin, window_fina
     # Initial list of stations to reject
     # ----------------------------------
     station_reject_list = _as_station_id_list(chronicle.get('stations_to_reject'),
-                            variable_name, ob_type)
+        variable_name, ob_type)
     # Store chronicle at the initial commissioned date
     add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)
 
@@ -267,8 +267,9 @@ def process_station_chronicles(ob_type, variable_name, window_begin, window_fina
 
         # If the chronicle has key remove_from_reject_list
         if 'remove_from_reject_list' in chronicle:
-            remove_list = _as_station_id_list(chronicle['remove_from_reject_list'],
-                           variable_name, ob_type)
+            remove_list = _as_station_id_list(
+                chronicle['remove_from_reject_list'],
+                variable_name, ob_type)
             station_reject_list = [item for item in station_reject_list if item not in remove_list]
 
         # If the chronicle has key revert_to_previous_chronicle
