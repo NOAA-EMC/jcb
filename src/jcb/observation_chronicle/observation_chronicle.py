@@ -84,7 +84,7 @@ class ObservationChronicle():
             # need to check the use of individual stations/locations
             stations_to_reject = obs_chronicle.get('stations_to_reject', {})
             jcb.abort_if(not isinstance(stations_to_reject, dict),
-                       f"stations_to_reject must be a dictionary.")
+                         "stations_to_reject must be a dictionary.")
             variables = [name for name in stations_to_reject.keys() if name != 'All']
 
             if not any(self.get_conventional_rejected_stations(observer, variable)
