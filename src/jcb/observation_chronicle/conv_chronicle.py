@@ -89,7 +89,7 @@ def _as_station_id_list(station_entries, variable_name, ob_type=''):
     if all_entries or var_entries:
         print(f"Observer {ob_type}, variable {variable_name}: "
               f"{len(all_entries)} stations rejected from 'All', "
-              f"{len(var_entries)} from '{variable_name}' "
+              f"{len(var_entries)} from '{variable_name}' ") 
     return [StationID(s) for s in all_entries + var_entries]
 
 
