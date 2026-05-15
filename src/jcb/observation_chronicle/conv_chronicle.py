@@ -224,8 +224,11 @@ def process_station_chronicles(ob_type, variable_name, window_begin, window_fina
 
     # Initial list of stations to reject
     # ----------------------------------
-    station_reject_list = _as_station_id_list(chronicle.get('stations_to_reject'),
-        variable_name, ob_type)
+    station_reject_list = _as_station_id_list(
+        chronicle.get('stations_to_reject'),
+        variable_name,
+        ob_type,
+    )
     # Store chronicle at the initial commissioned date
     add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)
 
