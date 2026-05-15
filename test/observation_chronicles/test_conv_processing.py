@@ -25,7 +25,8 @@ window_option: max
 
 # observation type initial configuration
 # --------------------------------
-stations_to_reject: ['KBWI', 'KIAD']
+stations_to_reject:
+  totalSnowDepth: ['KBWI', 'KIAD']
 
 # Chronicle of changes for this observation type
 # ----------------------------------------
@@ -33,15 +34,18 @@ chronicles:
 
 - action_date: "2009-12-22T00:00:00"
   justification: 'I do not like DCA anymore'
-  add_to_reject_list: ['KDCA']
+  add_to_reject_list:
+    All: ['KDCA']
 
 - action_date: "2009-12-25T00:00:00"
   justification: 'I now like BWI'
-  remove_from_reject_list: ['KBWI']
+  remove_from_reject_list:
+    totalSnowDepth: ['KBWI']
 
 - action_date: "2009-12-26T00:00:00"
   justification: 'I do not like CGS anymore'
-  add_to_reject_list: ['KCGS']
+  add_to_reject_list:
+    All: ['KCGS']
 
 """
 
@@ -57,7 +61,7 @@ def test_window_before_chronicles():
     window_begin = datetime.fromisoformat("2009-04-15T00:00:00")
     window_final = datetime.fromisoformat("2009-04-15T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
                                                   conv_chronicle)
 
     # Check against expected output
@@ -73,7 +77,7 @@ def test_window_after_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
                                                   conv_chronicle)
 
     # Check against expected output
@@ -91,7 +95,7 @@ def test_window_straddles_chronicle():
     window_begin = datetime.fromisoformat("2009-12-24T21:00:00")
     window_final = datetime.fromisoformat("2009-12-25T03:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
                                                   conv_chronicle)
 
     # Check against expected output
@@ -111,7 +115,7 @@ def test_no_chronicles():
     window_begin = datetime.fromisoformat("2010-01-01T00:00:00")
     window_final = datetime.fromisoformat("2010-01-01T06:00:00")
 
-    station_list = jcb.process_station_chronicles('test_adpsfc', window_begin, window_final,
+    station_list = jcb.process_station_chronicles('test_adpsfc', 'totalSnowDepth', window_begin, window_final,
                                                   no_chronicles)
 
     # Check against expected output
