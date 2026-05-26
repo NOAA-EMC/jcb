@@ -79,7 +79,11 @@ class ObservationChronicle():
         if decommissioned_str and self.window_final > decommissioned:
             return False
 
-        # The variable-specific work is handled by the dedicated getter methods.
+        if obs_chronicle['observer_type'] == 'satellite':
+
+            # If there are no simulated channels then return False
+            if not self.get_satellite_variable(observer, 'simulated'):
+                return False
 
         # If made it through all the checks then the data is active and should be used
         # ----------------------------------------------------------------------------
