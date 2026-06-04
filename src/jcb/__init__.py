@@ -18,7 +18,7 @@ from .utilities.trapping import abort, abort_if
 
 
 # JCB Version
-__version__ = '0.1.0'
+__version__ = '0.0.3'
 
 
 def version():
