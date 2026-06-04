@@ -1,0 +1,42 @@
+name: Publish Python distributions to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to build and publish (for example, v0.0.2)
+        required: true
+        type: string
+
+jobs:
+  build-and-publish:
+    name: Build and publish Python distribution to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.tag || github.event.release.tag_name }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install pypa/build
+      run: |
+        python3 -m pip install build --user
+
+    - name: Build a binary wheel and a source tarball
+      run: |
+        python3 -m build --sdist --wheel --outdir dist/ .
+
+    - name: Publish distribution to PyPI
+      if: ${{ (github.event_name == 'workflow_dispatch' && inputs.tag != '') || github.event_name == 'release' }}
+      uses: pypa/gh-action-pypi-publish@release/v1
