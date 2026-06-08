@@ -18,7 +18,7 @@ class ObservationChronicle():
     def __init__(self, chronicle_path, window_begin, window_length):
 
         # Keep the chronicle path
-        self.chronicle_path = chronicle_path 
+        self.chronicle_path = chronicle_path
 
         # Convert the window_begin coming in as a string to a datetime object
         self.window_begin = datetime.strptime(window_begin, '%Y-%m-%dT%H:%M:%SZ')
