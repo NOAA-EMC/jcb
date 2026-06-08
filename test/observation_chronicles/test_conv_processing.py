@@ -33,13 +33,15 @@ stations_to_reject:
 chronicles:
 
 - action_date: "2009-12-22T00:00:00"
-  justification: 'I do not like DCA anymore'
+  justification: 'I do not like DCA or DEN anymore'
   add_to_reject_list:
-    All: ['KDCA']
+    All: ['KDEN']
+    totalSnowDepth: ['DCA']
 
 - action_date: "2009-12-25T00:00:00"
-  justification: 'I now like BWI'
+  justification: 'I now like BWI and DEN'
   remove_from_reject_list:
+    All: ['KDEN']
     totalSnowDepth: ['KBWI']
 
 - action_date: "2009-12-26T00:00:00"
