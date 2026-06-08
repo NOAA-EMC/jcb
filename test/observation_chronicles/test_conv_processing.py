@@ -36,7 +36,7 @@ chronicles:
   justification: 'I do not like DCA or DEN anymore'
   add_to_reject_list:
     All: ['KDEN']
-    totalSnowDepth: ['DCA']
+    totalSnowDepth: ['KDCA']
 
 - action_date: "2009-12-25T00:00:00"
   justification: 'I now like BWI and DEN'
