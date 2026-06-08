@@ -3,7 +3,7 @@ name: JCB Tests
 on:
   push:
     branches:
-      - develop
+      - feature/rej_by_var
   pull_request:
     types:
       - opened
