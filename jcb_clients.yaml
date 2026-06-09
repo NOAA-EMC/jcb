@@ -1,6 +1,6 @@
 gdas:
   git_url: noaa-emc/gdasapp
-  git_ref: feature/rej_by_var
+  git_ref: develop
   app_subdir: parm/jcb-gdas
 
 #rdas:
