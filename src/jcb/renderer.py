@@ -32,6 +32,8 @@ def get_nested_dict(nested_dict, keys):
 
 # --------------------------------------------------------------------------------------------------
 
+IODA_STATION_ID_VARNAME = 'MetaData/stationIdentification'
+
 
 def _retype_station_id_lists(obj):
     """
@@ -39,7 +41,7 @@ def _retype_station_id_lists(obj):
     """
     if isinstance(obj, dict):
         if (isinstance(obj.get('variable'), dict)
-                and obj['variable'].get('name') == 'MetaData/stationIdentification'
+                and obj['variable'].get('name') == IODA_STATION_ID_VARNAME
                 and isinstance(obj.get('is_in'), list)):
             obj['is_in'] = [StationID(s) if isinstance(s, str) else s
                             for s in obj['is_in']]

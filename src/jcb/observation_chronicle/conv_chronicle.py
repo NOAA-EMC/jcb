@@ -9,15 +9,13 @@ import yaml
 
 
 """
-We need the output YAML to include quote marks around station IDs. PyYAML will only use
-quotes for strings that it deems unambiguous values.
-Add a StationID subclass and representer to force the use of quotes.
+StationID subclass and representer to ensure quoted strings in YAML output.
 """
 # --------------------------------------------------------------------------------------------------
 
 
 class StationID(str):
-    """Str subclass to force PyYAML to retain/write out as strings."""
+    """Str subclass to force PyYAML to emit strings with quotes."""
     pass
 
 
@@ -65,6 +63,35 @@ function_map = {
     'min': min,
     'max': max,
 }
+
+VARIABLE_ALL = 'All'
+
+# --------------------------------------------------------------------------------------------------
+
+
+def _as_station_id_list(station_entries, variable_name, ob_type=''):
+
+    """
+    Normalize station entries into a list of StationID values for a given variable.
+
+    Station entries must be a dictionary, with 'All' and/or variable-specific keys.
+    Returns the merged list of All + variable_specific stations.
+    """
+    if not station_entries:
+        return []
+
+    jcb.abort_if(not isinstance(station_entries, dict),
+                 f"Station reject list for {variable_name} must be a dict with optional 'All' and "
+                 f"variable-specific keys (e.g., {{'All': [...], '{variable_name}': [...]}}).")
+
+    all_entries = station_entries.get(VARIABLE_ALL, []) or []
+    var_entries = station_entries.get(variable_name, []) or []
+    if all_entries or var_entries:
+        print(f"Observer {ob_type}, variable {variable_name}: "
+              f"{len(all_entries)} stations rejected from 'All', "
+              f"{len(var_entries)} from '{variable_name}' ")
+    return [StationID(s) for s in all_entries + var_entries]
+
 
 # --------------------------------------------------------------------------------------------------
 
@@ -131,7 +158,8 @@ def get_left_index(error_message, action_dates, insert_point):
 # --------------------------------------------------------------------------------------------------
 
 
-def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in):
+def process_station_chronicles(ob_type, variable_name, window_begin, window_final,
+                               chronicle_in):
 
     """
     Process conventional observation station chronicles for a specified time window, determining
@@ -143,11 +171,13 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
     is a set of station IDs adjusted according to the specified window and strategies.
 
     Args:
+        ob_type (str): The (BUFR) observation type being processed.
+        variable_name (str): IODA variable name for the variable being processed.
         window_begin (datetime): The beginning of the data assimilation window.
         window_final (datetime): The end of the data assimilation window.
-        chronicle (dict): A dictionary containing the observation type's commissioning data,
-                          station reject list, and a list of chronological actions (chronicles) that
-                          include  adjustments or reverts of station IDs.
+        chronicle_in (dict): A dictionary containing the observation type's commissioning data,
+                             station reject list, and a list of chronological actions (chronicles)
+                             that include adjustments or reverts of station IDs.
 
     Returns:
         list: A list of strings of station IDs that should be included in a reject list
@@ -159,7 +189,7 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     Note:
         The function assumes that the station IDs are properly structured
-        in the input `chronicle` dictionary.
+        in the input `chronicle_in` dictionary.
     """
     # Copy the incoming chronicle to avoid modifying the original
     # -----------------------------------------------------------
@@ -167,7 +197,9 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     # Create a message to prepend any errors with
     # -------------------------------------------
-    errors_message_pre = f"Error processing station reject list chronicle for {ob_type}"
+    errors_message_pre = (
+        f"Error processing station reject list chronicle for {ob_type} variable {variable_name}"
+    )
 
     # Commissioned time for this platform
     # -----------------------------------
@@ -194,7 +226,11 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
     # Initial list of stations to reject
     # ----------------------------------
-    station_reject_list = [StationID(s) for s in chronicle.get('stations_to_reject') or []]
+    station_reject_list = _as_station_id_list(
+        chronicle.get('stations_to_reject'),
+        variable_name,
+        ob_type,
+    )
     # Store chronicle at the initial commissioned date
     add_to_evolving_observing_system(evolving_observing_system, commissioned, station_reject_list)
 
@@ -231,12 +267,14 @@ def process_station_chronicles(ob_type, window_begin, window_final, chronicle_in
 
         # If the chronicle has key add_to_reject_list
         if 'add_to_reject_list' in chronicle:
-            add_list = [StationID(s) for s in chronicle['add_to_reject_list']]
+            add_list = _as_station_id_list(chronicle['add_to_reject_list'], variable_name, ob_type)
             station_reject_list = station_reject_list + add_list
 
         # If the chronicle has key remove_from_reject_list
         if 'remove_from_reject_list' in chronicle:
-            remove_list = [StationID(s) for s in chronicle['remove_from_reject_list']]
+            remove_list = _as_station_id_list(
+                chronicle['remove_from_reject_list'],
+                variable_name, ob_type)
             station_reject_list = [item for item in station_reject_list if item not in remove_list]
 
         # If the chronicle has key revert_to_previous_chronicle
