@@ -171,8 +171,8 @@ def process_station_chronicles(ob_type, variable_name, window_begin, window_fina
     is a set of station IDs adjusted according to the specified window and strategies.
 
     Args:
-        ob_type (str): The observation type being processed.
-        variable_name (str): The variable name used to select variable-scoped reject lists.
+        ob_type (str): The (BUFR) observation type being processed.
+        variable_name (str): IODA variable name for the variable being processed.
         window_begin (datetime): The beginning of the data assimilation window.
         window_final (datetime): The end of the data assimilation window.
         chronicle_in (dict): A dictionary containing the observation type's commissioning data,
