@@ -111,7 +111,10 @@ class Renderer():
 
             # Take the last element of the path and set this to the model_component in the
             # dictionary. The path might end in a slash so split on / and take the last element.
-            self.template_dict['model_component'] = app_path_model.split('/')[-1] + '_'
+            # An explicit model_component in the template dictionary takes precedence; this lets
+            # coupled applications (which span more than one model component) set their own value.
+            if 'model_component' not in self.template_dict:
+                self.template_dict['model_component'] = app_path_model.split('/')[-1] + '_'
 
             # Check if app_path_model is an absolute path
             if os.path.isabs(app_path_model):
@@ -119,23 +122,45 @@ class Renderer():
             else:
                 self.j2_search_paths += [os.path.join(config_path, 'apps', app_path_model)]
 
-        # Path with observation files if app needs obs things
+        # Additional model component paths for coupled applications. These let the search path
+        # span more than one model component (e.g. atmosphere and marine) so that coupled
+        # algorithm templates can include fragments from each component.
+        for app_path_model_extra in self.template_dict.get('app_paths_model_extra', []):
+            if os.path.isabs(app_path_model_extra):
+                self.j2_search_paths += [app_path_model_extra]
+            else:
+                self.j2_search_paths += [os.path.join(config_path, 'apps', app_path_model_extra)]
+
+        # Path(s) with observation files if app needs obs things. The primary path comes from
+        # app_path_observations and additional (coupled) paths from app_paths_observations_extra.
+        # The all_observations list is assembled across every observation path.
+        obs_paths = []
         app_path_observations = self.template_dict.get('app_path_observations')
         if app_path_observations:
-
             if os.path.isabs(app_path_observations):
-                obs_path = app_path_observations
+                obs_paths += [app_path_observations]
             else:
-                obs_path = os.path.join(config_path, 'apps', app_path_observations)
+                obs_paths += [os.path.join(config_path, 'apps', app_path_observations)]
 
-            self.j2_search_paths += [obs_path]
+        for app_path_observations_extra in self.template_dict.get('app_paths_observations_extra',
+                                                                  []):
+            if os.path.isabs(app_path_observations_extra):
+                obs_paths += [app_path_observations_extra]
+            else:
+                obs_paths += [os.path.join(config_path, 'apps', app_path_observations_extra)]
 
-            # Get a list of all the observation files that end in .yaml.j2
-            obs_files = [f for f in os.listdir(obs_path) if
-                         os.path.isfile(os.path.join(obs_path, f)) and f.endswith('.yaml.j2')]
+        if obs_paths:
 
-            # Remove the .yaml.j2 extension from the observation list
-            all_observations = [f[:-8] for f in obs_files]
+            self.j2_search_paths += obs_paths
+
+            # Get a list of all the observation files that end in .yaml.j2 across all obs paths
+            all_observations = []
+            for obs_path in obs_paths:
+                obs_files = [f for f in os.listdir(obs_path) if
+                             os.path.isfile(os.path.join(obs_path, f)) and f.endswith('.yaml.j2')]
+
+                # Remove the .yaml.j2 extension from the observation list
+                all_observations += [f[:-8] for f in obs_files]
 
             # If self.template_dict['observations'] is 'all_observations' or ['all_observations']
             # or is not present then replace it with self.template_dict['all_observations']
