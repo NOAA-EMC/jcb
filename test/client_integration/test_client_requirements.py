@@ -84,7 +84,8 @@ def test_model_files_have_prepended_templates():
                         file_string = f.read()
 
                     # Collect names that Jinja binds locally within this file, i.e. for loop
-                    # variables ({% for <name> in ... %}) and set variables ({% set <name> = ... %}).
+                    # variables ({% for <name> in ... %}) and set variables
+                    # ({% set <name> = ... %}).
                     # These are not client template keys, so they cannot collide between model
                     # components and are exempt from the <component>_ prefix requirement. This
                     # allows templates that loop over a list of components, as needed for coupled
