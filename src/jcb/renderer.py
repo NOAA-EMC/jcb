@@ -336,12 +336,10 @@ class Renderer():
                     obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                     obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
 
-                    # One-step L/GETKF: instead of setting the obs space's initial
-                    # "distribution" directly, compute H(x) under the default (RoundRobin)
-                    # distribution and then re-decompose into the local-solver distribution
-                    # via the obs redistribution machinery, which requires the dataframe
-                    # ioda backend. This lets a single job do what would otherwise be a
-                    # separate observer/solver pair.
+                    # One-step L/GETKF: instead of setting the obs space's distribution
+                    # directly, first compute H(x) under the default (RoundRobin)
+                    # distribution and then redistribute into the specified distribution
+                    # This also requires the dataframe ioda backend
                     do_onestep_getkf = self.template_dict.get('do_onestep_getkf', False)
                     obs_dist_key = 'redistribution' if do_onestep_getkf else 'distribution'
 
