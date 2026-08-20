@@ -336,9 +336,20 @@ class Renderer():
                     obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                     obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
 
+                    # One-step L/GETKF: instead of setting the obs space's initial
+                    # "distribution" directly, compute H(x) under the default (RoundRobin)
+                    # distribution and then re-decompose into the local-solver distribution
+                    # via the obs redistribution machinery, which requires the dataframe
+                    # ioda backend. This lets a single job do what would otherwise be a
+                    # separate observer/solver pair.
+                    do_onestep_getkf = self.template_dict.get('do_onestep_getkf', False)
+                    obs_dist_key = 'redistribution' if do_onestep_getkf else 'distribution'
+
                     # Loop over the observers and add obs distribution and localizations
                     for observer in observers:
-                        observer['obs space']['distribution'] = obs_dist
+                        observer['obs space'][obs_dist_key] = obs_dist
+                        if do_onestep_getkf:
+                            observer['obs space']['use data frame container'] = True
                         observer['obs localizations'] = obs_loc
 
                     # Override obs distribution and localizations for matching observations
@@ -355,7 +366,9 @@ class Renderer():
                                 obs_dist_loc_dict = override_obs_dist_loc_dict.get(obs_name, {})
                                 obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                                 obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
-                                observer['obs space']['distribution'] = obs_dist
+                                observer['obs space'][obs_dist_key] = obs_dist
+                                if do_onestep_getkf:
+                                    observer['obs space']['use data frame container'] = True
                                 observer['obs localizations'] = obs_loc
                 else:
                     print('WARNING: obs_distribution_localizations in local_ensemble_da is')
