@@ -340,13 +340,13 @@ class Renderer():
                     # directly, first compute H(x) under the default (RoundRobin)
                     # distribution and then redistribute into the specified distribution
                     # This also requires the dataframe ioda backend
-                    do_onestep_getkf = self.template_dict.get('do_onestep_getkf', False)
-                    obs_dist_key = 'redistribution' if do_onestep_getkf else 'distribution'
+                    do_onestep_letkf = self.template_dict.get('do_onestep_letkf', False)
+                    obs_dist_key = 'redistribution' if do_onestep_letkf else 'distribution'
 
                     # Loop over the observers and add obs distribution and localizations
                     for observer in observers:
                         observer['obs space'][obs_dist_key] = obs_dist
-                        if do_onestep_getkf:
+                        if do_onestep_letkf:
                             observer['obs space']['use data frame container'] = True
                         observer['obs localizations'] = obs_loc
 
@@ -365,7 +365,7 @@ class Renderer():
                                 obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                                 obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
                                 observer['obs space'][obs_dist_key] = obs_dist
-                                if do_onestep_getkf:
+                                if do_onestep_letkf:
                                     observer['obs space']['use data frame container'] = True
                                 observer['obs localizations'] = obs_loc
                 else:
