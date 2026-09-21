@@ -336,9 +336,18 @@ class Renderer():
                     obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                     obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
 
+                    # One-step L/GETKF: instead of setting the obs space's distribution
+                    # directly, first compute H(x) under the default (RoundRobin)
+                    # distribution and then redistribute into the specified distribution
+                    # This also requires the dataframe ioda backend
+                    do_onestep_letkf = self.template_dict.get('do_onestep_letkf', False)
+                    obs_dist_key = 'redistribution' if do_onestep_letkf else 'distribution'
+
                     # Loop over the observers and add obs distribution and localizations
                     for observer in observers:
-                        observer['obs space']['distribution'] = obs_dist
+                        observer['obs space'][obs_dist_key] = obs_dist
+                        if do_onestep_letkf:
+                            observer['obs space']['use data frame container'] = True
                         observer['obs localizations'] = obs_loc
 
                     # Override obs distribution and localizations for matching observations
@@ -355,7 +364,9 @@ class Renderer():
                                 obs_dist_loc_dict = override_obs_dist_loc_dict.get(obs_name, {})
                                 obs_dist = obs_dist_loc_dict.get('obs_distribution', {})
                                 obs_loc = obs_dist_loc_dict.get('obs_localizations', {})
-                                observer['obs space']['distribution'] = obs_dist
+                                observer['obs space'][obs_dist_key] = obs_dist
+                                if do_onestep_letkf:
+                                    observer['obs space']['use data frame container'] = True
                                 observer['obs localizations'] = obs_loc
                 else:
                     print('WARNING: obs_distribution_localizations in local_ensemble_da is')
