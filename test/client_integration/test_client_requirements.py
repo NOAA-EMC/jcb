@@ -23,6 +23,8 @@ Clients that attach to JCB have to meet various requirements in order to pass th
 
 1. Files in the model/<component> directory of the application must only use keys (templates) that
    start with <component>_, to avoid ambiguity when multiple model components are being used.
+   Variables bound locally within a file by Jinja itself (for loop variables and set variables)
+   are exempt, since they are not client template keys and cannot collide across components.
 
 2. Files in the model/<component> directory of the application must start with <component>_ to
    avoid ambiguity when multiple model components are being used.
@@ -81,6 +83,19 @@ def test_model_files_have_prepended_templates():
                     with open(file_path, 'r') as f:
                         file_string = f.read()
 
+                    # Collect names that Jinja binds locally within this file, i.e. for loop
+                    # variables ({% for <name> in ... %}) and set variables
+                    # ({% set <name> = ... %}).
+                    # These are not client template keys, so they cannot collide between model
+                    # components and are exempt from the <component>_ prefix requirement. This
+                    # allows templates that loop over a list of components, as needed for coupled
+                    # data assimilation.
+                    local_names = set()
+                    for loop_targets in re.findall(r'{%-?\s*for\s+([^%]*?)\s+in\s', file_string):
+                        local_names |= {name.strip() for name in loop_targets.split(',')}
+                    local_names |= set(re.findall(r'{%-?\s*set\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=',
+                                                  file_string))
+
                     # Get every instance of {{...}} in the file
                     template_keys = re.findall(r'{{(.*?)}}', file_string)
 
@@ -92,6 +107,12 @@ def test_model_files_have_prepended_templates():
 
                     # Check that every element of template_keys starts with app_model_component_
                     for key in template_keys:
+
+                        # Skip keys rooted in a Jinja local, including attribute or item access
+                        # on it (e.g. component.name or component['name']).
+                        if re.split(r'[.\[]', key)[0] in local_names:
+                            continue
+
                         assert key.split('_')[0] == app_model_component, \
                             f"{message} Template key {key} in file {file} in app {app}/model/" + \
                             f"{app_model_component} does not start with {app_model_component}_."
